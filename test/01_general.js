@@ -50,6 +50,13 @@ describe("General", () => {
 
 			expect(cache._.internalcache[0].ttl).to.be.within(Date.now() - DIFFERENCE_ALLOWED, Date.now() + DIFFERENCE_ALLOWED);
 		});
+
+		it("Should put item with idPrefix", () => {
+			cache.settings.idPrefix = "myapp_";
+			cache.put("test", {"item": 123});
+
+			expect(cache._.internalcache).to.eql([{"item": 123, "id": "myapp_test"}]);
+		});
 	});
 
 	describe("get()", () => {
@@ -75,7 +82,14 @@ describe("General", () => {
 			cache.put("test", {"item": 123, "ttl": 0});
 
 			expect(cache.get("test")).to.be.undefined;
-		})
+		});
+
+		it("Should get item with idPrefix", () => {
+			cache.put("myapp_test", {"item": 123});
+			cache.settings.idPrefix = "myapp_";
+
+			expect(cache.get("test")).to.eql({"item": 123, "id": "myapp_test"});
+		});
 	});
 
 	describe("_.refreshinternalcache()", () => {

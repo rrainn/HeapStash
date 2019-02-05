@@ -30,6 +30,11 @@ class HeapStash {
 		if (!id) {
 			throw new Error("ID required to get item from cache.");
 		}
+
+		if (this.settings.idPrefix) {
+			id = `${this.settings.idPrefix}${id}`;
+		}
+
 		const item = this._.internalcache.find((item) => item.id === id);
 		if (item) {
 			if (typeof item.ttl === "number") {
@@ -47,6 +52,10 @@ class HeapStash {
 		}
 		if (!item) {
 			throw new Error("Item required to put item in cache.");
+		}
+
+		if (this.settings.idPrefix) {
+			id = `${this.settings.idPrefix}${id}`;
 		}
 
 		item = {...item, id};
