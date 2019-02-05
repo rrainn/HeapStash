@@ -53,7 +53,12 @@ class HeapStash {
 		if (this.settings.ttl) {
 			item.ttl = Date.now() + this.settings.ttl;
 		}
-		this._.internalcache.push(item);
+		const existingIndex = this._.internalcache.findIndex((item) => item.id === id);
+		if (existingIndex === -1) {
+			this._.internalcache.push(item);
+		} else {
+			this._.internalcache[existingIndex] = item;
+		}
 
 		// var params = {
 		// 	Item: {

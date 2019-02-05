@@ -29,6 +29,20 @@ describe("General", () => {
 			expect(cache._.internalcache).to.eql([{"item": 123, "id": "test"}]);
 		});
 
+		it("Should not put duplicate items in internalcache", () => {
+			cache.put("test", {"item": 123});
+			cache.put("test", {"item": 123});
+
+			expect(cache._.internalcache).to.eql([{"item": 123, "id": "test"}]);
+		});
+
+		it("Should replace item if duplicate id", () => {
+			cache.put("test", {"item": 123});
+			cache.put("test", {"item": 456});
+
+			expect(cache._.internalcache).to.eql([{"item": 456, "id": "test"}]);
+		});
+
 		it("Should put item in internalcache with ttl if specified in settings", () => {
 			const DIFFERENCE_ALLOWED = 10;
 			cache.settings.ttl = 1;
