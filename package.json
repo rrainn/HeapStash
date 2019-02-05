@@ -24,5 +24,8 @@
   "bugs": {
     "url": "https://github.com/rrainn/HeapStash/issues"
   },
-  "homepage": "https://github.com/rrainn/HeapStash#readme"
+  "homepage": "https://github.com/rrainn/HeapStash#readme",
+  "dependencies": {
+    "dynamoose": "1.5.0"
+  }
 }
