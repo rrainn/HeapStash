@@ -84,6 +84,13 @@ describe("General", () => {
 			expect(cache.get("test")).to.be.undefined;
 		});
 
+		it("Should return item if TTL is in the future", () => {
+			const data = {"item": 123, "ttl": Date.now() + 1000};
+			cache.put("test", data);
+
+			expect(cache.get("test")).to.eql(data);
+		});
+
 		it("Should get item with idPrefix", () => {
 			cache.put("myapp_test", {"item": 123});
 			cache.settings.idPrefix = "myapp_";
