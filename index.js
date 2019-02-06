@@ -3,6 +3,8 @@
 // - Add max items internal cache setting
 // - Add support for removing item from cache
 // - Add support for secendary cache layer support (DynamoDB plugin)
+// - Add debug log support
+// - Write documentation
 
 class HeapStash {
 	// dynamodbTableName
