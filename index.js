@@ -1,7 +1,7 @@
 // TODO:
 
-// - Fix issue with storing strings, numbers, booleans, etc
 // - Add max items internal cache setting
+// - Add support for removing item from cache
 // - Add support for secendary cache layer support (DynamoDB plugin)
 
 class HeapStash {
@@ -37,10 +37,10 @@ class HeapStash {
 		if (item) {
 			if (typeof item.ttl === "number") {
 				if (item.ttl > Date.now()) {
-					return item;
+					return item.data;
 				}
 			} else {
-				return item;
+				return item.data;
 			}
 		}
 	}
@@ -84,7 +84,7 @@ class HeapStash {
 		if (!id) {
 			throw new Error("ID required to put item in cache.");
 		}
-		if (!item) {
+		if (item === undefined || item === null) {
 			throw new Error("Item required to put item in cache.");
 		}
 
@@ -92,11 +92,11 @@ class HeapStash {
 			id = `${this.settings.idPrefix}${id}`;
 		}
 
-		item = {...item};
+		const storedObject = {"data": item};
 		if (this.settings.ttl) {
-			item.ttl = Date.now() + this.settings.ttl;
+			storedObject.ttl = Date.now() + this.settings.ttl;
 		}
-		this._.internalcache[id] = item;
+		this._.internalcache[id] = storedObject;
 
 		// var params = {
 		// 	Item: {
