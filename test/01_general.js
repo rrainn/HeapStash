@@ -26,21 +26,21 @@ describe("General", () => {
 		it("Should put item in internalcache", () => {
 			cache.put("test", {"item": 123});
 
-			expect(cache._.internalcache).to.eql([{"item": 123, "id": "test"}]);
+			expect(cache._.internalcache).to.eql({"test": {"item": 123}});
 		});
 
 		it("Should not put duplicate items in internalcache", () => {
 			cache.put("test", {"item": 123});
 			cache.put("test", {"item": 123});
 
-			expect(cache._.internalcache).to.eql([{"item": 123, "id": "test"}]);
+			expect(cache._.internalcache).to.eql({"test": {"item": 123}});
 		});
 
 		it("Should replace item if duplicate id", () => {
 			cache.put("test", {"item": 123});
 			cache.put("test", {"item": 456});
 
-			expect(cache._.internalcache).to.eql([{"item": 456, "id": "test"}]);
+			expect(cache._.internalcache).to.eql({"test": {"item": 456}});
 		});
 
 		it("Should put item in internalcache with ttl if specified in settings", () => {
@@ -48,14 +48,14 @@ describe("General", () => {
 			cache.settings.ttl = 1;
 			cache.put("test", {"item": 123});
 
-			expect(cache._.internalcache[0].ttl).to.be.within(Date.now() - DIFFERENCE_ALLOWED, Date.now() + DIFFERENCE_ALLOWED);
+			expect(cache._.internalcache["test"].ttl).to.be.within(Date.now() - DIFFERENCE_ALLOWED, Date.now() + DIFFERENCE_ALLOWED);
 		});
 
 		it("Should put item with idPrefix", () => {
 			cache.settings.idPrefix = "myapp_";
 			cache.put("test", {"item": 123});
 
-			expect(cache._.internalcache).to.eql([{"item": 123, "id": "myapp_test"}]);
+			expect(cache._.internalcache).to.eql({"myapp_test": {"item": 123}});
 		});
 	});
 
@@ -75,7 +75,7 @@ describe("General", () => {
 		it("Should return item if exists in cache", () => {
 			cache.put("test", {"item": 123});
 
-			expect(cache.get("test")).to.eql({"item": 123, "id": "test"});
+			expect(cache.get("test")).to.eql({"item": 123});
 		});
 
 		it("Should return undefined if TTL is in the past", () => {
@@ -88,7 +88,7 @@ describe("General", () => {
 			cache.put("myapp_test", {"item": 123});
 			cache.settings.idPrefix = "myapp_";
 
-			expect(cache.get("test")).to.eql({"item": 123, "id": "myapp_test"});
+			expect(cache.get("test")).to.eql({"item": 123});
 		});
 	});
 
@@ -98,7 +98,7 @@ describe("General", () => {
 
 			cache._.refreshinternalcache();
 
-			expect(cache._.internalcache).to.eql([]);
+			expect(cache._.internalcache).to.eql({});
 		});
 
 		it("Should remove all items if ttl is in the past", () => {
@@ -108,7 +108,7 @@ describe("General", () => {
 
 			cache._.refreshinternalcache();
 
-			expect(cache._.internalcache).to.eql([]);
+			expect(cache._.internalcache).to.eql({});
 		});
 
 		it("Should keep items in the future", () => {
@@ -120,7 +120,7 @@ describe("General", () => {
 
 			cache._.refreshinternalcache();
 
-			expect(cache._.internalcache.length).to.eql(2);
+			expect(Object.keys(cache._.internalcache).length).to.eql(2);
 		});
 	});
 });

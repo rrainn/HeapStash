@@ -4,24 +4,15 @@ class HeapStash {
 		this.settings = settings;
 
 		const refreshinternalcache = () => {
-			let removeIndexes = [];
-			const removeElements = () => {
-				removeIndexes.reverse();
-				removeIndexes.forEach((i) => this._.internalcache.splice(i, 1));
-			}
-
-			for (let i = 0; i < this._.internalcache.length; i++) {
-				if (this._.internalcache[i].ttl <= Date.now()) {
-					removeIndexes.push(i);
-				} else {
-					removeElements();
-					return;
+			Object.keys(this._.internalcache).forEach((key) => {
+				const item = this._.internalcache[key];
+				if (item.ttl <= Date.now()) {
+					delete this._.internalcache[key];
 				}
-			}
-			removeElements();
+			});
 		};
 		this._ = {
-			"internalcache": [],
+			"internalcache": {},
 			refreshinternalcache
 		};
 	}
@@ -35,7 +26,7 @@ class HeapStash {
 			id = `${this.settings.idPrefix}${id}`;
 		}
 
-		const item = this._.internalcache.find((item) => item.id === id);
+		const item = this._.internalcache[id];
 		if (item) {
 			if (typeof item.ttl === "number") {
 				if (item.ttl > Date.now()) {
@@ -58,16 +49,11 @@ class HeapStash {
 			id = `${this.settings.idPrefix}${id}`;
 		}
 
-		item = {...item, id};
+		item = {...item};
 		if (this.settings.ttl) {
 			item.ttl = Date.now() + this.settings.ttl;
 		}
-		const existingIndex = this._.internalcache.findIndex((item) => item.id === id);
-		if (existingIndex === -1) {
-			this._.internalcache.push(item);
-		} else {
-			this._.internalcache[existingIndex] = item;
-		}
+		this._.internalcache[id] = item;
 
 		// var params = {
 		// 	Item: {
