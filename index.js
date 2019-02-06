@@ -1,3 +1,9 @@
+// TODO:
+
+// - Fix issue with storing strings, numbers, booleans, etc
+// - Add max items internal cache setting
+// - Add support for secendary cache layer support (DynamoDB plugin)
+
 class HeapStash {
 	// dynamodbTableName
 	constructor(settings = {}) {
@@ -13,6 +19,7 @@ class HeapStash {
 		};
 		this._ = {
 			"internalcache": {},
+			"inprogressfetchpromises": {},
 			refreshinternalcache
 		};
 	}
@@ -36,6 +43,42 @@ class HeapStash {
 				return item;
 			}
 		}
+	}
+	fetch(id, retrieveFunction) {
+		if (!id) {
+			throw new Error("ID required to fetch item.");
+		}
+		if (!retrieveFunction) {
+			throw new Error("Retrieve function required to fetch item.");
+		}
+
+		return new Promise(async (resolve, reject) => {
+			const cacheItem = this.get(id);
+			if (cacheItem) {
+				resolve(cacheItem);
+			} else if (this._.inprogressfetchpromises[id]) {
+				this._.inprogressfetchpromises[id].push({resolve, reject});
+			} else {
+				this._.inprogressfetchpromises[id] = [];
+
+				let result, inprogressfetchpromises;
+				let action = resolve;
+				try {
+					result = await retrieveFunction(id);
+					this.put(id, result);
+					inprogressfetchpromises = this._.inprogressfetchpromises[id].map((item) => item.resolve);
+				} catch (e) {
+					result = e;
+					action = reject;
+					inprogressfetchpromises = this._.inprogressfetchpromises[id].map((item) => item.reject);
+				}
+
+				inprogressfetchpromises.forEach((action) => action(result));
+				delete this._.inprogressfetchpromises[id];
+
+				action(result);
+			}
+		});
 	}
 	put(id, item) {
 		if (!id) {
