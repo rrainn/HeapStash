@@ -9,29 +9,35 @@ describe("remove()", () => {
 		expect(cache.remove).to.be.a("function");
 	});
 
-	it("Should throw error if no ID passed in", () => {
-		expect(cache.remove).to.throw("ID required to delete item from cache.");
+	it("Should throw error if no ID passed in", async () => {
+		let error;
+		try {
+			await cache.remove();
+		} catch (e) {
+			error = e;
+		}
+		expect(error.message).to.eql("ID required to delete item from cache.");
 	});
 
-	it("Should remove item from cache", () => {
+	it("Should remove item from cache", async () => {
 		cache._.internalcache["test"] = {"data": 123};
 		cache._.internalcachearray.push("test");
 
-		cache.remove("test");
+		await cache.remove("test");
 
 		expect(cache._.internalcache).to.eql({});
 	});
 
-	it("Should fail silently if item not in cache", () => {
-		cache.remove("test");
+	it("Should fail silently if item not in cache", async () => {
+		await cache.remove("test");
 
 		expect(cache._.internalcache).to.eql({});
 	});
 
-	it("Should fail silently if item not in cache array", () => {
+	it("Should fail silently if item not in cache array", async () => {
 		cache._.internalcache["test"] = {"data": 123};
 
-		cache.remove("test");
+		await cache.remove("test");
 
 		expect(cache._.internalcache).to.eql({});
 	});

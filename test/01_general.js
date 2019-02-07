@@ -9,9 +9,9 @@ describe("General", () => {
 		const tests = [1, "Hello World", true, false, () => {}, [1, 2, 3], {"data": 1}];
 
 		tests.forEach((test) => {
-			it(`Should store ${typeof test === "object" ? JSON.stringify(test) : test} correctly`, () => {
-				cache.put("item", test);
-				expect(cache.get("item")).to.eql(test);
+			it(`Should store ${typeof test === "object" ? JSON.stringify(test) : test} correctly`, async () => {
+				await cache.put("item", test);
+				expect(await cache.get("item")).to.eql(test);
 			});
 		});
 	});

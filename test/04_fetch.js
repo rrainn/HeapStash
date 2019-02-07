@@ -63,7 +63,7 @@ describe("fetch()", () => {
 		expect(cache._.inprogressfetchpromises).to.eql({});
 	});
 
-	it("Should add resolve and reject methods to array if pending action", async () => {
+	it("Should add resolve and reject methods to array if pending action", (done) => {
 		let counter = 0;
 		const func = () => {
 			counter++;
@@ -72,14 +72,18 @@ describe("fetch()", () => {
 		cache.fetch("test", func);
 		cache.fetch("test", func);
 
-		expect(cache._.inprogressfetchpromises["test"]).to.be.an("array");
-		expect(cache._.inprogressfetchpromises["test"].length).to.eql(1);
-		expect(cache._.inprogressfetchpromises["test"][0].resolve).to.be.a("function");
-		expect(cache._.inprogressfetchpromises["test"][0].reject).to.be.a("function");
-		expect(counter).to.eql(1);
+		setTimeout(() => {
+			expect(cache._.inprogressfetchpromises["test"]).to.be.an("array");
+			expect(cache._.inprogressfetchpromises["test"].length).to.eql(1);
+			expect(cache._.inprogressfetchpromises["test"][0].resolve).to.be.a("function");
+			expect(cache._.inprogressfetchpromises["test"][0].reject).to.be.a("function");
+			expect(counter).to.eql(1);
+
+			done();
+		}, 1);
 	});
 
-	it("Should call resolve on other promise after resolved", async () => {
+	it("Should call resolve on other promise after resolved", (done) => {
 		let finalize;
 		const func = () => {
 			return new Promise((resolve) => {
@@ -89,14 +93,19 @@ describe("fetch()", () => {
 			});
 		};
 		cache.fetch("test", func);
-		finalize();
-		const res = await cache.fetch("test", func);
 
-		expect(res).to.eql({"data": "test"});
-		expect(cache._.inprogressfetchpromises).to.eql({});
+		setTimeout(async () => {
+			finalize();
+			const res = await cache.fetch("test", func);
+
+			expect(res).to.eql({"data": "test"});
+			expect(cache._.inprogressfetchpromises).to.eql({});
+
+			done();
+		}, 1);
 	});
 
-	it("Should call reject on other promise after resolved", async () => {
+	it("Should call reject on other promise after resolved", (done) => {
 		let finalize, res, error;
 		const func = () => {
 			return new Promise((resolve, reject) => {
@@ -107,16 +116,21 @@ describe("fetch()", () => {
 		};
 
 		cache.fetch("test", func).catch(() => {});
-		finalize();
 
-		try {
-			res = await cache.fetch("test", func);
-		} catch (e) {
-			error = e;
-		}
+		setTimeout(async () => {
+			finalize();
 
-		expect(error.message).to.eql("Error");
-		expect(res).to.not.exist;
-		expect(cache._.inprogressfetchpromises).to.eql({});
+			try {
+				res = await cache.fetch("test", func);
+			} catch (e) {
+				error = e;
+			}
+
+			expect(error.message).to.eql("Error");
+			expect(res).to.not.exist;
+			expect(cache._.inprogressfetchpromises).to.eql({});
+
+			done();
+		}, 1);
 	});
 });

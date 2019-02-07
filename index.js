@@ -26,7 +26,7 @@ class HeapStash {
 		};
 	}
 
-	get(id) {
+	async get(id) {
 		if (!id) {
 			throw new Error("ID required to get item from cache.");
 		}
@@ -55,7 +55,7 @@ class HeapStash {
 		}
 
 		return new Promise(async (resolve, reject) => {
-			const cacheItem = this.get(id);
+			const cacheItem = await this.get(id);
 			if (cacheItem) {
 				resolve(cacheItem);
 			} else if (this._.inprogressfetchpromises[id]) {
@@ -67,7 +67,7 @@ class HeapStash {
 				let action = resolve;
 				try {
 					result = await retrieveFunction(id);
-					this.put(id, result);
+					await this.put(id, result);
 					inprogressfetchpromises = this._.inprogressfetchpromises[id].map((item) => item.resolve);
 				} catch (e) {
 					result = e;
@@ -82,7 +82,7 @@ class HeapStash {
 			}
 		});
 	}
-	put(id, item) {
+	async put(id, item) {
 		if (!id) {
 			throw new Error("ID required to put item in cache.");
 		}
@@ -105,20 +105,8 @@ class HeapStash {
 		}
 		this._.internalcache[id] = storedObject;
 		this._.internalcachearray.push(id);
-
-		// var params = {
-		// 	Item: {
-		// 		"id": {
-		// 			S: id
-		// 		},
-		// 	},
-		// 	ReturnConsumedCapacity: "TOTAL",
-		// 	TableName: "Music"
-		// };
-		// dynamodb.putItem(params, function(err, data) {
-		// });
 	}
-	remove(id) {
+	async remove(id) {
 		if (!id) {
 			throw new Error("ID required to delete item from cache.");
 		}
@@ -133,5 +121,19 @@ class HeapStash {
 		}
 	}
 }
+
+
+// var params = {
+// 	Item: {
+// 		"id": {
+// 			S: id
+// 		},
+// 	},
+// 	ReturnConsumedCapacity: "TOTAL",
+// 	TableName: "Music"
+// };
+// dynamodb.putItem(params, function(err, data) {
+// });
+
 
 module.exports = HeapStash;
