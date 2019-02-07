@@ -1,7 +1,7 @@
 {
   "name": "heapstash",
   "version": "1.0.0",
-  "description": "HeapStash is a library that allows for easy caching in Node.js.",
+  "description": "HeapStash is a library that allows for easy caching in Node.js, with many advanced features such as TTL, maximum items in memory cache, external cache support, and more.",
   "main": "index.js",
   "scripts": {
     "test": "mocha --recursive",
