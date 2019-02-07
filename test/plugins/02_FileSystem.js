@@ -63,7 +63,7 @@ describe("FileSystem", () => {
 				} else {
 					try {
 						data = JSON.parse(data);
-						expect(data).to.eql({"myitem": "Hello World"});
+						expect(data).to.eql({"data": {"myitem": "Hello World"}});
 						resolve();
 					} catch (e) {
 						reject(e);

@@ -74,6 +74,17 @@ const fsCache = HeapStash.Plugin.FileSystem({"path": path.join(__dirname, "cache
 cache.plugins.push(fsCache);
 ```
 
+### HeapStash.Plugin.DynamoDB(settings)
+
+This method returns a plugin instance of the DynamoDB plugin. You must pass in `settings` as an object with the following properties:
+
+- `tableName` - The name of the DynamoDB table you wish to use
+- `dynamodb` (optional, default: `new AWS.DynamoDB()`) - The `AWS.DynamoDB` instance you wish to use
+- `primaryKey` (optional, default: `id`) - The primary key for the table that we will use to store the ID
+- `ttlAttribute` (optional, default: `ttl`) - The TTL attribute for DynamoDB
+
+You must create your DynamoDB table prior to using this plugin.
+
 ## Other Information
 
 ### debug
