@@ -1,9 +1,8 @@
 // TODO:
 
-// - Add max items internal cache setting
 // - Add support for secendary cache layer support (DynamoDB plugin)
-// - Add debug log support
 // - Write documentation
+// - Add debug log support
 // - Add support for overwriting TTL for specific item
 
 class HeapStash {
@@ -21,6 +20,7 @@ class HeapStash {
 		};
 		this._ = {
 			"internalcache": {},
+			"internalcachearray": [],
 			"inprogressfetchpromises": {},
 			refreshinternalcache
 		};
@@ -94,11 +94,17 @@ class HeapStash {
 			id = `${this.settings.idPrefix}${id}`;
 		}
 
+		while (this.settings.maxItems && this._.internalcachearray.length >= this.settings.maxItems) {
+			const removeID = this._.internalcachearray.shift();
+			this.remove(removeID);
+		}
+
 		const storedObject = {"data": item};
 		if (this.settings.ttl) {
 			storedObject.ttl = Date.now() + this.settings.ttl;
 		}
 		this._.internalcache[id] = storedObject;
+		this._.internalcachearray.push(id);
 
 		// var params = {
 		// 	Item: {
@@ -117,7 +123,14 @@ class HeapStash {
 			throw new Error("ID required to delete item from cache.");
 		}
 
-		delete this._.internalcache[id];
+		if (this._.internalcache[id]) {
+			const internalcachearrayIndex = this._.internalcachearray.findIndex((item) => item === id);
+			if (internalcachearrayIndex >= 0) {
+				this._.internalcachearray.splice(internalcachearrayIndex, 1);
+			}
+
+			delete this._.internalcache[id];
+		}
 	}
 }
 

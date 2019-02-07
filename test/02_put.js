@@ -27,6 +27,12 @@ describe("put()", () => {
 		expect(cache._.internalcache).to.eql({"test": {"data": {"item": 123}}});
 	});
 
+	it("Should put item in internalcachearray", () => {
+		cache.put("test", {"item": 123});
+
+		expect(cache._.internalcachearray).to.eql(["test"]);
+	});
+
 	it("Should not put duplicate items in internalcache", () => {
 		cache.put("test", {"item": 123});
 		cache.put("test", {"item": 123});
@@ -54,5 +60,15 @@ describe("put()", () => {
 		cache.put("test", {"item": 123});
 
 		expect(cache._.internalcache).to.eql({"myapp_test": {"data": {"item": 123}}});
+	});
+
+	it("Should remove old items if maxItems is exceeded", () => {
+		cache.settings.maxItems = 2;
+		cache.put("test", {"item": 123});
+		cache.put("test1", {"item": 123});
+		cache.put("test2", {"item": 123});
+
+		expect(cache._.internalcache).to.eql({"test1": {"data": {"item": 123}}, "test2": {"data": {"item": 123}}});
+		expect(cache._.internalcachearray).to.eql(["test1", "test2"]);
 	});
 });

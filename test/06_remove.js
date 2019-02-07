@@ -15,6 +15,21 @@ describe("remove()", () => {
 
 	it("Should remove item from cache", () => {
 		cache._.internalcache["test"] = {"data": 123};
+		cache._.internalcachearray.push("test");
+
+		cache.remove("test");
+
+		expect(cache._.internalcache).to.eql({});
+	});
+
+	it("Should fail silently if item not in cache", () => {
+		cache.remove("test");
+
+		expect(cache._.internalcache).to.eql({});
+	});
+
+	it("Should fail silently if item not in cache array", () => {
+		cache._.internalcache["test"] = {"data": 123};
 
 		cache.remove("test");
 
