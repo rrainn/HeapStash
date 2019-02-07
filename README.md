@@ -1,5 +1,8 @@
 # HeapStash [![Build Status](https://travis-ci.org/rrainn/HeapStash.svg?branch=master)](https://travis-ci.org/rrainn/HeapStash) [![Coverage Status](https://coveralls.io/repos/github/rrainn/HeapStash/badge.svg?branch=master)](https://coveralls.io/github/rrainn/HeapStash?branch=master) [![Known Vulnerabilities](https://snyk.io/test/github/rrainn/HeapStash/badge.svg)](https://snyk.io/test/github/rrainn/HeapStash) [![Dependencies](https://david-dm.org/rrainn/HeapStash.svg)](https://david-dm.org/rrainn/HeapStash) [![Dev Dependencies](https://david-dm.org/rrainn/HeapStash/dev-status.svg)](https://david-dm.org/rrainn/HeapStash?type=dev) [![NPM version](https://badge.fury.io/js/HeapStash.svg)](http://badge.fury.io/js/HeapStash)
 
+## General
+
+HeapStash is a Node.js cache engine meant to make it easier to work with your data. It was built out of a need for a caching system to cache data from external sources. HeapStash has many great features such as TTL support, maximum memory cache item support, fetch support to run an async retrieve function and cache multiple times before getting the result, external cache support with plugins, and many more great features.
 
 ## Installation
 
