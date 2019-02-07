@@ -1,10 +1,10 @@
 // TODO:
 
 // - Add max items internal cache setting
-// - Add support for removing item from cache
 // - Add support for secendary cache layer support (DynamoDB plugin)
 // - Add debug log support
 // - Write documentation
+// - Add support for overwriting TTL for specific item
 
 class HeapStash {
 	// dynamodbTableName
@@ -111,6 +111,13 @@ class HeapStash {
 		// };
 		// dynamodb.putItem(params, function(err, data) {
 		// });
+	}
+	remove(id) {
+		if (!id) {
+			throw new Error("ID required to delete item from cache.");
+		}
+
+		delete this._.internalcache[id];
 	}
 }
 
