@@ -31,21 +31,21 @@ The HeapStash constructor lets you create a cache object. It accepts a settings 
 
 You can also edit the `settings` at any time by adjusting the `cache.settings` object.
 
-### cache.get(id)
+### cache.get(id[, settings])
 
-This method allows you to retrieve an item from the cache for the given ID. This method will return the given object you requested, or undefined if the item does not exist in the cache.
+This method allows you to retrieve an item from the cache for the given ID. This method will return the given object you requested, or undefined if the item does not exist in the cache. The settings parameter is an optional object that you can pass in with a `internalCacheOnly` property that if set to true, won't call the get method on the plugins.
 
 This method returns a promise that will resolve with the cached item.
 
-### cache.put(id, item)
+### cache.put(id, item[, settings])
 
-This method allows you to put an item in the cache. This method will overwrite any existing item with the same ID in the cache.
+This method allows you to put an item in the cache. This method will overwrite any existing item with the same ID in the cache. The settings parameter is an optional object that you can pass in with a `internalCacheOnly` property that if set to true, won't call the put method on the plugins.
 
 This method returns a promise that will resolve when the item has been put in the cache.
 
-### cache.remove(id)
+### cache.remove(id[, settings])
 
-This method allows you to remove an item from the cache. If the ID does not exist in the cache this method will fail silently.
+This method allows you to remove an item from the cache. If the ID does not exist in the cache this method will fail silently. The settings parameter is an optional object that you can pass in with a `internalCacheOnly` property that if set to true, won't call the remove method on the plugins.
 
 This method returns a promise that will resolve when the item has been removed from the cache.
 

@@ -41,4 +41,17 @@ describe("remove()", () => {
 
 		expect(cache._.internalcache).to.eql({});
 	});
+
+	it("Should not call any plugins if internalCacheOnly is set to true", async () => {
+		let called = false;
+		const plugin = new HeapStash.Plugin();
+		plugin.tasks.remove = () => {
+			called = true;
+		};
+		cache.plugins.push(plugin);
+
+		await cache.remove("test", {"internalCacheOnly": true});
+
+		expect(called).to.be.false;
+	});
 });

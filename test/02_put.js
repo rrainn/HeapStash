@@ -89,4 +89,17 @@ describe("put()", () => {
 		expect(cache._.internalcache).to.eql({"test1": {"data": {"item": 123}}, "test2": {"data": {"item": 123}}});
 		expect(cache._.internalcachearray).to.eql(["test1", "test2"]);
 	});
+
+	it("Should not call any plugins if internalCacheOnly is set to true", async () => {
+		let called = false;
+		const plugin = new HeapStash.Plugin();
+		plugin.tasks.put = () => {
+			called = true;
+		};
+		cache.plugins.push(plugin);
+
+		await cache.put("test", {"item": 123}, {"internalCacheOnly": true});
+
+		expect(called).to.be.false;
+	});
 });

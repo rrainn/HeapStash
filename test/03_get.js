@@ -48,4 +48,17 @@ describe("get()", () => {
 
 		expect(await cache.get("test")).to.eql({"item": 123});
 	});
+
+	it("Should not call any plugins if internalCacheOnly is set to true", async () => {
+		let called = false;
+		const plugin = new HeapStash.Plugin();
+		plugin.tasks.get = () => {
+			called = true;
+		};
+		cache.plugins.push(plugin);
+
+		await cache.get("test", {"internalCacheOnly": true});
+
+		expect(called).to.be.false;
+	});
 });
