@@ -4,7 +4,7 @@
   "description": "HeapStash is a library that allows for easy caching in Node.js.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha",
+    "test": "mocha --recursive",
     "lint": "eslint ."
   },
   "repository": {
@@ -32,6 +32,7 @@
   "devDependencies": {
     "chai": "4.2.0",
     "coveralls": "3.0.2",
+    "del": "3.0.0",
     "eslint": "5.13.0",
     "mocha": "5.2.0",
     "nyc": "13.2.0"

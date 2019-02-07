@@ -12,7 +12,7 @@ describe("get()", () => {
 	it("Should throw if no string passed in for ID", async () => {
 		let error;
 		try {
-			const res = await cache.get();
+			await cache.get();
 		} catch (e) {
 			error = e;
 		}
