@@ -73,6 +73,14 @@ describe("put()", () => {
 		expect(cache._.internalcache["test"].ttl).to.be.within(Date.now() - DIFFERENCE_ALLOWED, Date.now() + DIFFERENCE_ALLOWED);
 	});
 
+	it("Should put item in internalcache with custom ttl", async () => {
+		const DIFFERENCE_ALLOWED = 10;
+		cache.settings.ttl = 60000;
+		await cache.put("test", {"item": 123}, {"ttl": 1});
+
+		expect(cache._.internalcache["test"].ttl).to.be.within(Date.now() - DIFFERENCE_ALLOWED, Date.now() + DIFFERENCE_ALLOWED);
+	});
+
 	it("Should put item with idPrefix", async () => {
 		cache.settings.idPrefix = "myapp_";
 		await cache.put("test", {"item": 123});
