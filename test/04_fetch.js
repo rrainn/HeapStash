@@ -133,4 +133,99 @@ describe("fetch()", () => {
 			done();
 		}, 1);
 	});
+
+	it("Should only call plugin once", (done) => {
+		let finalize, res, error;
+		const func = () => {
+			return new Promise((resolve, reject) => {});
+		};
+
+		let count = 0;
+		const plugin = new HeapStash.Plugin();
+		plugin.tasks.get = async () => {
+			count++;
+
+			return new Promise((resolve) => {
+				finalize = () => {
+					resolve({"data": "test"});
+				};
+			});
+		};
+		cache.plugins.push(plugin);
+
+		cache.fetch("test", func);
+		cache.fetch("test", func);
+		cache.fetch("test", func);
+
+		setTimeout(async () => {
+			expect(count).to.eql(1);
+
+			done();
+		}, 1);
+	});
+
+	it("Should only call plugin once and resolve correctly", async () => {
+		let finalize, res, error;
+		const func = () => {
+			return new Promise((resolve, reject) => {});
+		};
+
+		let count = 0;
+		const plugin = new HeapStash.Plugin();
+		plugin.tasks.get = async () => {
+			count++;
+
+			return new Promise((resolve) => {
+				finalize = () => {
+					resolve({"data": "test"});
+				};
+			});
+		};
+		cache.plugins.push(plugin);
+
+		setTimeout(() => finalize(), 50);
+
+		const resA = await cache.fetch("test", func);
+		const resB = await cache.fetch("test", func);
+		const resC = await cache.fetch("test", func);
+
+		expect(resA).to.eql("test");
+		expect(resB).to.eql("test");
+		expect(resC).to.eql("test");
+	});
+
+	it("Should only call retrieveFunction once after plugin", (done) => {
+		let finalize, res, error;
+		let count = 0;
+		const func = () => {
+			count++;
+			return new Promise((resolve, reject) => {});
+		};
+
+		const plugin = new HeapStash.Plugin();
+		plugin.tasks.get = async () => {
+			return new Promise((resolve, reject) => {
+				finalize = () => {
+					reject();
+				};
+			});
+		};
+		cache.plugins.push(plugin);
+
+		cache.fetch("test", func);
+		cache.fetch("test", func);
+		cache.fetch("test", func);
+
+		setTimeout(() => {
+			expect(count).to.eql(0);
+
+			finalize();
+
+			setTimeout(() => {
+				expect(count).to.eql(1);
+
+				done();
+			}, 1);
+		}, 1);
+	});
 });
