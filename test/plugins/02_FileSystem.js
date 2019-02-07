@@ -95,5 +95,16 @@ describe("FileSystem", () => {
 			expect(error.message).to.include("ENOENT: no such file or directory");
 			expect(data).to.not.exist;
 		});
+
+		it("Should fail silently if no item in cache", async () => {
+			let error;
+			try {
+				await cache.remove("id3");
+			} catch (e) {
+				error = e;
+			}
+
+			expect(error).to.not.exist;
+		});
 	});
 });
