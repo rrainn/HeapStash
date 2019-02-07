@@ -70,3 +70,15 @@ This method returns a plugin instance of the File System plugin. You must pass i
 const fsCache = HeapStash.Plugin.FileSystem({"path": path.join(__dirname, "cache", "filesystem")});
 cache.plugins.push(fsCache);
 ```
+
+## Other Information
+
+### debug
+
+HeapStash has a lot of debug information that you can access by running the following command before running your Node.js script.
+
+```
+$ export DEBUG=HeapStash*
+```
+
+This will print a lot of useful information about the inner workings of HeapStash. It's recommended that you run this command if you are experiencing any problems related to HeapStash to help debug your code.
