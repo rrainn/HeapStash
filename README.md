@@ -13,7 +13,7 @@ $ npm i heapstash
 ## Getting Started
 
 ```js
-const HeapStash = require("HeapStash");
+const HeapStash = require("heapstash");
 const cache = new HeapStash();
 ```
 
