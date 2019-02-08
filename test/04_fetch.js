@@ -135,9 +135,8 @@ describe("fetch()", () => {
 	});
 
 	it("Should only call plugin once", (done) => {
-		let finalize, res, error;
 		const func = () => {
-			return new Promise((resolve, reject) => {});
+			return new Promise(() => {});
 		};
 
 		let count = 0;
@@ -145,11 +144,7 @@ describe("fetch()", () => {
 		plugin.tasks.get = async () => {
 			count++;
 
-			return new Promise((resolve) => {
-				finalize = () => {
-					resolve({"data": "test"});
-				};
-			});
+			return new Promise(() => {});
 		};
 		cache.plugins.push(plugin);
 
@@ -165,16 +160,13 @@ describe("fetch()", () => {
 	});
 
 	it("Should only call plugin once and resolve correctly", async () => {
-		let finalize, res, error;
+		let finalize;
 		const func = () => {
-			return new Promise((resolve, reject) => {});
+			return new Promise(() => {});
 		};
 
-		let count = 0;
 		const plugin = new HeapStash.Plugin();
 		plugin.tasks.get = async () => {
-			count++;
-
 			return new Promise((resolve) => {
 				finalize = () => {
 					resolve({"data": "test"});
@@ -195,11 +187,11 @@ describe("fetch()", () => {
 	});
 
 	it("Should only call retrieveFunction once after plugin", (done) => {
-		let finalize, res, error;
+		let finalize;
 		let count = 0;
 		const func = () => {
 			count++;
-			return new Promise((resolve, reject) => {});
+			return new Promise(() => {});
 		};
 
 		const plugin = new HeapStash.Plugin();

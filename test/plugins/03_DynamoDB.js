@@ -2,7 +2,7 @@ const HeapStash = require("../../");
 const {expect} = require("chai");
 const DynamoDB = HeapStash.Plugin.DynamoDB;
 const AWS = require("aws-sdk");
-const DynamoDbLocal = require('dynamodb-local');
+const DynamoDbLocal = require("dynamodb-local");
 const DYNAMO_DB_PORT = 8000;
 
 describe("DynamoDB", function() {
