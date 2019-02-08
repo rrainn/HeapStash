@@ -115,22 +115,22 @@ describe("fetch()", () => {
 			});
 		};
 
-		cache.fetch("test", func).catch(() => {});
-
-		setTimeout(async () => {
-			finalize();
-
-			try {
-				res = await cache.fetch("test", func);
-			} catch (e) {
-				error = e;
-			}
-
+		function check() {
 			expect(error.message).to.eql("Error");
 			expect(res).to.not.exist;
 			expect(cache._.inprogressfetchpromises).to.eql({});
 
 			done();
+		}
+
+		cache.fetch("test", func).catch(() => {});
+		cache.fetch("test", func).then((data) => res = data).catch((e) => {
+			error = e;
+			check();
+		});
+
+		setTimeout(async () => {
+			finalize();
 		}, 1);
 	});
 
