@@ -103,6 +103,28 @@ describe("DynamoDB", function() {
 
 			expect(dbItem).to.eql({"data": {"myitem": "Hello World"}});
 		});
+
+		it("Should use TTL", async () => {
+			const DIFFERENCE_ALLOWED = 1000;
+
+			cache.settings.ttl = 1;
+			await cache.put("id", {"myitem": "Hello World"});
+
+			const dbItem = AWS.DynamoDB.Converter.unmarshall((await dynamodb.getItem({
+				"Key": {
+					"id": {
+						"S": "id"
+					}
+				},
+				"TableName": "TestTable"
+			}).promise()).Item);
+			delete dbItem.id;
+
+			const myttl = dbItem.ttl;
+			delete dbItem.ttl;
+			expect(myttl).to.be.within(Date.now() - DIFFERENCE_ALLOWED, Date.now() + DIFFERENCE_ALLOWED);
+			expect(dbItem).to.eql({"data": {"myitem": "Hello World"}});
+		});
 	});
 
 	describe("remove()", () => {
