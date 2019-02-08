@@ -122,7 +122,7 @@ describe("DynamoDB", function() {
 
 			const myttl = dbItem.ttl;
 			delete dbItem.ttl;
-			expect(myttl).to.be.within(Date.now() - DIFFERENCE_ALLOWED, Date.now() + DIFFERENCE_ALLOWED);
+			expect(myttl).to.be.within((Date.now() - DIFFERENCE_ALLOWED) / 1000, (Date.now() + DIFFERENCE_ALLOWED) / 1000);
 			expect(dbItem).to.eql({"data": {"myitem": "Hello World"}});
 		});
 	});
