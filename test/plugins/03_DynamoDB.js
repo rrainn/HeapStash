@@ -19,6 +19,10 @@ describe("DynamoDB", function() {
 	});
 
 	let cache;
+	AWS.config.update({
+		"accessKeyId": "TESTID",
+		"secretAccessKey": "TESTSECRET"
+	});
 	let dynamodb = new AWS.DynamoDB({
 		"endpoint": new AWS.Endpoint("http://localhost:8000"),
 		"region": "us-west-2"
