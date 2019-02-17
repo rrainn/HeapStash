@@ -85,6 +85,40 @@ describe("DynamoDB", function() {
 
 			expect(res).to.eql("test");
 		});
+
+		describe("TTL", () => {
+			const properties = ["ttl", "customttlproperty"];
+
+			properties.forEach((prop) => {
+				describe(`Property - ${prop}`, () => {
+					if (prop !== "ttl") {
+						beforeEach(() => cache.plugins = [DynamoDB({dynamodb, "ttlAttribute": prop, "tableName": "TestTable"})]);
+					}
+					beforeEach(() => dynamodb.putItem({
+						"Item": AWS.DynamoDB.Converter.marshall({"id": "id3", [prop]: Date.now() / 1000, "data": "test"}),
+						"TableName": "TestTable"
+					}).promise());
+					beforeEach(() => dynamodb.putItem({
+						"Item": AWS.DynamoDB.Converter.marshall({"id": "id4", [prop]: (Date.now() * (1000 * 60)) / 1000, "data": "test"}),
+						"TableName": "TestTable"
+					}).promise());
+
+
+					it("Should return correct item for ttl in the past", async () => {
+						const res = await cache.get("id3");
+
+						expect(res).to.not.exist;
+					});
+
+					it("Should return correct item for ttl in the future", async () => {
+						const res = await cache.get("id4");
+
+						expect(res).to.eql("test");
+					});
+
+				});
+			});
+		});
 	});
 
 	describe("put()", () => {
@@ -104,26 +138,38 @@ describe("DynamoDB", function() {
 			expect(dbItem).to.eql({"data": {"myitem": "Hello World"}});
 		});
 
-		it("Should use TTL", async () => {
-			const DIFFERENCE_ALLOWED = 1000;
+		describe("TTL", () => {
+			const properties = ["ttl", "customttlproperty"];
 
-			cache.settings.ttl = 1;
-			await cache.put("id", {"myitem": "Hello World"});
-
-			const dbItem = AWS.DynamoDB.Converter.unmarshall((await dynamodb.getItem({
-				"Key": {
-					"id": {
-						"S": "id"
+			properties.forEach((prop) => {
+				describe(`Property - ${prop}`, () => {
+					if (prop !== "ttl") {
+						beforeEach(() => cache.plugins = [DynamoDB({dynamodb, "ttlAttribute": prop, "tableName": "TestTable"})]);
 					}
-				},
-				"TableName": "TestTable"
-			}).promise()).Item);
-			delete dbItem.id;
 
-			const myttl = dbItem.ttl;
-			delete dbItem.ttl;
-			expect(myttl).to.be.within((Date.now() - DIFFERENCE_ALLOWED) / 1000, (Date.now() + DIFFERENCE_ALLOWED) / 1000);
-			expect(dbItem).to.eql({"data": {"myitem": "Hello World"}});
+					it(`Should use correct TTL`, async () => {
+						const DIFFERENCE_ALLOWED = 1000;
+
+						cache.settings.ttl = 1;
+						await cache.put("id", {"myitem": "Hello World"});
+
+						const dbItem = AWS.DynamoDB.Converter.unmarshall((await dynamodb.getItem({
+							"Key": {
+								"id": {
+									"S": "id"
+								}
+							},
+							"TableName": "TestTable"
+						}).promise()).Item);
+						delete dbItem.id;
+
+						const myttl = dbItem[prop];
+						delete dbItem[prop];
+						expect(myttl).to.be.within((Date.now() - DIFFERENCE_ALLOWED) / 1000, (Date.now() + DIFFERENCE_ALLOWED) / 1000);
+						expect(dbItem).to.eql({"data": {"myitem": "Hello World"}});
+					});
+				});
+			});
 		});
 	});
 
