@@ -147,7 +147,7 @@ describe("DynamoDB", function() {
 						beforeEach(() => cache.plugins = [DynamoDB({dynamodb, "ttlAttribute": prop, "tableName": "TestTable"})]);
 					}
 
-					it(`Should use correct TTL`, async () => {
+					it("Should use correct TTL", async () => {
 						const DIFFERENCE_ALLOWED = 1000;
 
 						cache.settings.ttl = 1;

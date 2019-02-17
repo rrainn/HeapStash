@@ -227,7 +227,7 @@ describe("fetch()", () => {
 
 		it("Should not include idPrefix in retrieveFunction argument", async () => {
 			let calledID;
-			const res = await cache.fetch("test", async (id) => {
+			await cache.fetch("test", async (id) => {
 				calledID = id;
 				return "Hello World";
 			});
