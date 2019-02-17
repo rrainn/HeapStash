@@ -53,9 +53,30 @@ This method returns a promise that will resolve when the item has been removed f
 
 This method allows you to get an item from the cache then fall back to a retrieveFunction if the item is not in the cache. If you call `cache.fetch` multiple times before the `retrieveFunction` has completed, it will only call the `retrieveFunction` once, and resolve all the promises after that one `retrieveFunction` has completed.
 
-The `retrieveFunction` can either be a standard function, async function, or a function that returns a promise.
+The `retrieveFunction` can either be a standard function, async function, or a function that returns a promise. The `id` will be passed into the `retrieveFunction` as the first parameter. Although it will use the `idPrefix` for caching purposes, the `idPrefix` will not be attached to the argument passed into the `retrieveFunction`.
 
 This method returns a promise that will resolve with the item with the data when available.
+
+**Example**
+
+```js
+function getURL(urlToRetrieve) {
+	return cache.fetch(urlToRetrieve, async (url) => {
+		// `urlToRetrieve` will be passed in as the `url` parameter
+		return (await axios(url)).data;
+	});
+}
+
+// In the following example an Axios (network request) request will only be made once, and `a` and `b` will equal each other
+const a = await getURL("https://rrainn.com");
+const b = await getURL("https://rrainn.com");
+const itemsEqual = a === b; // true
+
+// In the following example an Axios (network request) request will only be made twice (since IDs are different and not stored in cache), and `c` and `d` will NOT equal each other
+const c = await getURL("https://cclipss.com");
+const d = await getURL("https://faxdeliver.com");
+const secondItemsEqual = c === d; // false
+```
 
 ### cache.plugins
 
