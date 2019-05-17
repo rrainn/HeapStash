@@ -24,7 +24,7 @@ describe("DynamoDB", function() {
 		"secretAccessKey": "TESTSECRET"
 	});
 	let dynamodb = new AWS.DynamoDB({
-		"endpoint": new AWS.Endpoint("http://localhost:8000"),
+		"endpoint": new AWS.Endpoint(`http://localhost:${DYNAMO_DB_PORT}`),
 		"region": "us-west-2"
 	});
 	beforeEach(() => cache = new HeapStash());
