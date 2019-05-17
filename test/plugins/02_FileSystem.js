@@ -107,4 +107,39 @@ describe("FileSystem", () => {
 			expect(error).to.not.exist;
 		});
 	});
+
+	describe("clear()", () => {
+		beforeEach(() => new Promise((resolve, reject) => fs.writeFile(path.join(__dirname, "tmp", "id"), JSON.stringify({"data": {"myitem": "Hello World"}}), (err) => {
+			if (err) {
+				reject(err);
+			} else {
+				resolve();
+			}
+		})));
+
+		it("Should clear item from file system cache", async () => {
+			await cache.clear();
+
+			let error, data;
+			try {
+				data = fs.readFileSync(path.join(__dirname, "tmp", "id"), "utf8");
+			} catch (e) {
+				error = e;
+			}
+
+			expect(error.message).to.include("ENOENT: no such file or directory");
+			expect(data).to.not.exist;
+		});
+
+		it("Should fail silently if no item in cache", async () => {
+			let error;
+			try {
+				await cache.clear();
+			} catch (e) {
+				error = e;
+			}
+
+			expect(error).to.not.exist;
+		});
+	});
 });

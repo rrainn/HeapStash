@@ -205,4 +205,50 @@ describe("DynamoDB", function() {
 			expect(error).to.not.exist;
 		});
 	});
+
+	describe("clear()", () => {
+		beforeEach(() => dynamodb.putItem({
+			"Item": AWS.DynamoDB.Converter.marshall({"id": "id", "data": {"myitem": "Hello World"}}),
+			"TableName": "TestTable"
+		}).promise());
+
+		it("Should clear item from DynamoDB cache", async () => {
+			await cache.clear();
+
+			const data = AWS.DynamoDB.Converter.unmarshall((await dynamodb.getItem({
+				"Key": {
+					"id": {
+						"S": "id"
+					}
+				},
+				"TableName": "TestTable"
+			}).promise()).Item);
+
+			expect(data).to.eql({});
+		});
+
+		it("Should clear items from DynamoDB cache", async () => {
+			const dataMap = {"myitem": "Hello World", "largestring": new Array(100000).fill("a").join("")};
+			await Promise.all((new Array(15).fill("a").map((a, index) => index + 1)).map((item) => dynamodb.putItem({
+				"Item": AWS.DynamoDB.Converter.marshall({"id": `id${item}`, dataMap}),
+				"TableName": "TestTable"
+			}).promise()));
+
+			await cache.clear();
+
+			const data = (await dynamodb.scan({"TableName": "TestTable"}).promise()).Items;
+			expect(data).to.eql([]);
+		});
+
+		it("Should fail silently if no item in cache", async () => {
+			let error;
+			try {
+				await cache.clear();
+			} catch (e) {
+				error = e;
+			}
+
+			expect(error).to.not.exist;
+		});
+	});
 });

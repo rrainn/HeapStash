@@ -49,6 +49,12 @@ This method allows you to remove an item from the cache. If the ID does not exis
 
 This method returns a promise that will resolve when the item has been removed from the cache.
 
+### cache.clear([settings])
+
+This method allows you to clear all the items from the cache. The settings parameter is an optional object that you can pass in with a `internalCacheOnly` property that if set to true, won't call the clear method on the plugins.
+
+This method returns a promise that will resolve when the items have been cleared from the cache.
+
 ### cache.fetch(id, retrieveFunction)
 
 This method allows you to get an item from the cache then fall back to a retrieveFunction if the item is not in the cache. If you call `cache.fetch` multiple times before the `retrieveFunction` has completed, it will only call the `retrieveFunction` once, and resolve all the promises after that one `retrieveFunction` has completed.
