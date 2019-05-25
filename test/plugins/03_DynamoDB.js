@@ -198,6 +198,7 @@ describe("DynamoDB", function() {
 		});
 
 		describe("TTL", () => {
+			const DIFFERENCE_ALLOWED = 1000;
 			const properties = ["ttl", "customttlproperty"];
 
 			properties.forEach((prop) => {
@@ -207,8 +208,6 @@ describe("DynamoDB", function() {
 					}
 
 					it("Should use correct TTL", async () => {
-						const DIFFERENCE_ALLOWED = 1000;
-
 						cache.settings.ttl = 1;
 						await cache.put("id", {"myitem": "Hello World"});
 
