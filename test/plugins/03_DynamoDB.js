@@ -226,6 +226,31 @@ describe("DynamoDB", function() {
 						expect(myttl).to.be.within((Date.now() - DIFFERENCE_ALLOWED) / 1000, (Date.now() + DIFFERENCE_ALLOWED) / 1000);
 						expect(dbItem).to.eql({"data": {"myitem": "Hello World"}});
 					});
+
+					it("Should use correct TTL for empty strings", async () => {
+						const obj = {"myitem": "Hello World", "myseconditem": "", "myobj": {"hello": "world", "str": ""}};
+						cache.settings.ttl = 1;
+						await cache.put("id", obj);
+
+						const dbItem = AWS.DynamoDB.Converter.unmarshall((await dynamodb.getItem({
+							"Key": {
+								"id": {
+									"S": "id"
+								}
+							},
+							"TableName": "TestTable"
+						}).promise()).Item);
+						delete dbItem.id;
+						if ((dbItem._ || {}).stringified) {
+							dbItem.data = JSON.parse(dbItem.data);
+						}
+						delete dbItem._;
+
+						const myttl = dbItem[prop];
+						delete dbItem[prop];
+						expect(myttl).to.be.within((Date.now() - DIFFERENCE_ALLOWED) / 1000, (Date.now() + DIFFERENCE_ALLOWED) / 1000);
+						expect(dbItem).to.eql({"data": obj});
+					});
 				});
 			});
 		});
