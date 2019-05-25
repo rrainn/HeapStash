@@ -18,7 +18,10 @@
     "caching",
     "storage",
     "fast",
-    "speed"
+    "speed",
+    "time to live",
+    "ttl",
+    "stash"
   ],
   "author": "rrainn, Inc.",
   "license": "MIT",
