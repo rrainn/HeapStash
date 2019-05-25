@@ -162,7 +162,6 @@ describe("DynamoDB", function() {
 		});
 
 		it("Should work with empty strings", async () => {
-			// nock.recorder.rec();
 			await cache.put("id", {"myitem": "Hello World", "myseconditem": "", "myobj": {"hello": "world", "str": ""}});
 
 			const dbItem = AWS.DynamoDB.Converter.unmarshall((await dynamodb.getItem({
