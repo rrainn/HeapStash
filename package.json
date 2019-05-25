@@ -21,7 +21,11 @@
     "speed",
     "time to live",
     "ttl",
-    "stash"
+    "stash",
+    "plugins",
+    "plugin",
+    "filesystem",
+    "fs"
   ],
   "author": "rrainn, Inc.",
   "license": "MIT",
