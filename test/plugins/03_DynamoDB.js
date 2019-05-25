@@ -4,9 +4,20 @@ const DynamoDB = HeapStash.Plugin.DynamoDB;
 const AWS = require("aws-sdk");
 const DynamoDbLocal = require("dynamodb-local");
 const DYNAMO_DB_PORT = 8000;
+const nock = require("nock");
 
 describe("DynamoDB", function() {
 	this.timeout(60000);
+
+	beforeEach(() => {
+		if (!nock.isActive()) {
+			nock.activate();
+		}
+	});
+	afterEach(() => {
+		nock.cleanAll();
+		nock.restore();
+	});
 
 	let dynamoLocal;
 	before(async function() {
@@ -86,6 +97,18 @@ describe("DynamoDB", function() {
 			expect(res).to.eql("test");
 		});
 
+		it("Should work with empty strings in object", async () => {
+			const obj = {"myitem": "Hello World", "myseconditem": "", "myobj": {"hello": "world", "str": ""}};
+			await cache.put("mySpecialID", obj);
+
+			cache._.internalcache = {};
+			cache._.internalcachearray = [];
+
+			const res = await cache.get("mySpecialID");
+
+			expect(res).to.eql(obj);
+		});
+
 		describe("TTL", () => {
 			const properties = ["ttl", "customttlproperty"];
 
@@ -136,6 +159,43 @@ describe("DynamoDB", function() {
 			delete dbItem.id;
 
 			expect(dbItem).to.eql({"data": {"myitem": "Hello World"}});
+		});
+
+		it("Should work with empty strings", async () => {
+			// nock.recorder.rec();
+			await cache.put("id", {"myitem": "Hello World", "myseconditem": "", "myobj": {"hello": "world", "str": ""}});
+
+			const dbItem = AWS.DynamoDB.Converter.unmarshall((await dynamodb.getItem({
+				"Key": {
+					"id": {
+						"S": "id"
+					}
+				},
+				"TableName": "TestTable"
+			}).promise()).Item);
+			delete dbItem.id;
+			if ((dbItem._ || {}).stringified) {
+				dbItem.data = JSON.parse(dbItem.data);
+			}
+			delete dbItem._;
+
+			expect(dbItem).to.eql({"data": {"myitem": "Hello World", "myseconditem": "", "myobj": {"hello": "world", "str": ""}}});
+		});
+
+		it("Should throw error if DynamoDB throw an error", async () => {
+			nock("http://localhost:8000", {"encodedQueryParams":true})
+				.post("/")
+				.reply(400, {"__type":"com.amazon.coral#InternalServerError","message":"Internal Error."});
+
+			let result, error;
+			try {
+				result = await cache.put("id", {"myitem": "Hello World", "myseconditem": "", "myobj": {"hello": "world", "str": ""}});
+			} catch (e) {
+				error = e;
+			}
+
+			expect(result).to.not.exist;
+			expect(error).to.exist;
 		});
 
 		describe("TTL", () => {
