@@ -40,7 +40,6 @@ describe("fetch()", () => {
 
 	it("Should not use plugins for internalCacheOnly", async () => {
 		const DIFFERENCE_ALLOWED = 10;
-		cache.settings.ttl = 60000;
 		let called = 0;
 		const emptyFunc = () => {
 			called++;
