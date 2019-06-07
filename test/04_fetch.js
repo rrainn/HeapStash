@@ -28,6 +28,37 @@ describe("fetch()", () => {
 		expect(res).to.eql({"result": "data"});
 	});
 
+	it("Should put item in cache with custom ttl", async () => {
+		const DIFFERENCE_ALLOWED = 10;
+		cache.settings.ttl = 60000;
+		await cache.fetch("test", {"ttl": 1}, () => {
+			return "Hello World";
+		});
+
+		expect(cache._.internalcache["test"].ttl).to.be.within(Date.now() - DIFFERENCE_ALLOWED, Date.now() + DIFFERENCE_ALLOWED);
+	});
+
+	it("Should not use plugins for internalCacheOnly", async () => {
+		const DIFFERENCE_ALLOWED = 10;
+		cache.settings.ttl = 60000;
+		let called = 0;
+		const emptyFunc = () => {
+			called++;
+			return null;
+		};
+		cache.plugins.push({
+			"get": emptyFunc,
+			"put": emptyFunc,
+		});
+		const expectResult = "Hello World";
+		const result = await cache.fetch("test", {"internalCacheOnly": true}, () => {
+			return expectResult;
+		});
+
+		expect(called).to.eql(0);
+		expect(result).to.eql(expectResult);
+	});
+
 	it("Should call retrieveFunction if not in cache and not currently retrieving", async () => {
 		let calledRetrieveFunction = false;
 		let cacheinprogressfetchpromises;

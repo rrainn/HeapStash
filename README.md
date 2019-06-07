@@ -55,11 +55,13 @@ This method allows you to clear all the items from the cache. The settings param
 
 This method returns a promise that will resolve when the items have been cleared from the cache.
 
-### cache.fetch(id, retrieveFunction)
+### cache.fetch(id[, settings], retrieveFunction)
 
 This method allows you to get an item from the cache then fall back to a retrieveFunction if the item is not in the cache. If you call `cache.fetch` multiple times before the `retrieveFunction` has completed, it will only call the `retrieveFunction` once, and resolve all the promises after that one `retrieveFunction` has completed.
 
 The `retrieveFunction` can either be a standard function, async function, or a function that returns a promise. The `id` will be passed into the `retrieveFunction` as the first parameter. Although it will use the `idPrefix` for caching purposes, the `idPrefix` will not be attached to the argument passed into the `retrieveFunction`.
+
+The settings parameter is an optional object that you can pass in with a `internalCacheOnly` property that if set to true, won't call the put or get methods on the plugins. The settings object also accepts a `ttl` property to overwrite the default cache TTL with a custom one for that item you are putting in the cache.
 
 This method returns a promise that will resolve with the item with the data when available.
 
