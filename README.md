@@ -39,7 +39,7 @@ This method returns a promise that will resolve with the cached item.
 
 ### cache.put(id, item[, settings])
 
-This method allows you to put an item in the cache. This method will overwrite any existing item with the same ID in the cache. The settings parameter is an optional object that you can pass in with a `internalCacheOnly` property that if set to true, won't call the put method on the plugins. The settings object also accepts a `ttl` property to overwrite the default cache TTL with a custom one for that item you are putting in the cache.
+This method allows you to put an item in the cache. This method will overwrite any existing item with the same ID in the cache. The settings parameter is an optional object that you can pass in with a `internalCacheOnly` property that if set to true, won't call the put method on the plugins. The settings object also accepts a `ttl` property to overwrite the default cache TTL with a custom one for that item you are putting in the cache. If the `ttl` property is set to `false` the object will never expire and have no `ttl`, overwriting any `ttl` setting on the cache itself.
 
 This method returns a promise that will resolve when the item has been put in the cache.
 
@@ -61,7 +61,7 @@ This method allows you to get an item from the cache then fall back to a retriev
 
 The `retrieveFunction` can either be a standard function, async function, or a function that returns a promise. The `id` will be passed into the `retrieveFunction` as the first parameter. Although it will use the `idPrefix` for caching purposes, the `idPrefix` will not be attached to the argument passed into the `retrieveFunction`.
 
-The settings parameter is an optional object that you can pass in with a `internalCacheOnly` property that if set to true, won't call the put or get methods on the plugins. The settings object also accepts a `ttl` property to overwrite the default cache TTL with a custom one for that item you are putting in the cache.
+The settings parameter is an optional object that you can pass in with a `internalCacheOnly` property that if set to true, won't call the put or get methods on the plugins. The settings object also accepts a `ttl` property to overwrite the default cache TTL with a custom one for that item you are putting in the cache. If the `ttl` property is set to `false` the object will never expire and have no `ttl`, overwriting any `ttl` setting on the cache itself.
 
 This method returns a promise that will resolve with the item with the data when available.
 

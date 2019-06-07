@@ -38,6 +38,15 @@ describe("fetch()", () => {
 		expect(cache._.internalcache["test"].ttl).to.be.within(Date.now() - DIFFERENCE_ALLOWED, Date.now() + DIFFERENCE_ALLOWED);
 	});
 
+	it("Should put item in cache with no ttl", async () => {
+		cache.settings.ttl = 60000;
+		await cache.fetch("test", {"ttl": false}, () => {
+			return "Hello World";
+		});
+
+		expect(cache._.internalcache["test"].ttl).to.not.exist;
+	});
+
 	it("Should not use plugins for internalCacheOnly", async () => {
 		const DIFFERENCE_ALLOWED = 10;
 		let called = 0;
