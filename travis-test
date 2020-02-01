@@ -1,5 +1,0 @@
-#!/bin/bash
-
-set -ev
-eslint .
-nyc npm test && nyc report --reporter=text-lcov | coveralls
