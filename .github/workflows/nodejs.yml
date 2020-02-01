@@ -18,8 +18,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm install
-    - run: npm install -g nyc eslint
-    - run: eslint .
-    - run: nyc npm test && nyc report --reporter=text-lcov | coveralls
+    - run: npx eslint .
+    - run: npx nyc npm test && npx nyc report --reporter=text-lcov | npx coveralls
       env:
         CI: true
