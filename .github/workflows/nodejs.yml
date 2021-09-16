@@ -9,7 +9,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [8.x, 9.x, 10.x, 11.x, 12.x, 13.x, 14.x, 15.x, 16.x]
 
     steps:
     - uses: actions/checkout@v2
@@ -19,6 +19,8 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm install
     - run: npx eslint .
+    - name: Setup DynamoDB Local
+      uses: rrainn/dynamodb-action@v2.0.0
     - run: npx nyc npm test && npx nyc report --reporter=text-lcov | npx coveralls
       env:
         CI: true
