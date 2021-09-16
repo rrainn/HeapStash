@@ -1,79 +1,59 @@
-// import { Plugin } from "./index";
+import { Plugin } from "./index";
+import { MongoClient } from "mongodb";
 
-// module.exports = (settings) => {
-// 	const mongo = new Plugin();
+interface MongoDBPluginSettings {
+	client: MongoClient;
+	db: string;
+	collection: string;
+}
 
-// 	mongo.tasks.get = (id: string): Promise<any> => {
-// 		// return new Promise<any>((resolve, reject) => {
-// 		// 	fs.readFile(path.join(settings.path, id), "utf8", (err, data) => {
-// 		// 		if (data) {
-// 		// 			try {
-// 		// 				data = JSON.parse(data);
-// 		// 				resolve(data);
-// 		// 			} catch (e) {
-// 		// 				reject(e);
-// 		// 			}
-// 		// 		} else {
-// 		// 			reject();
-// 		// 		}
-// 		// 	});
-// 		// });
-// 	};
-// 	mongo.tasks.put = (id: string, data: any): Promise<void> => {
-// 		// return new Promise<void>((resolve, reject) => {
-// 		// 	fs.writeFile(path.join(settings.path, id), JSON.stringify(data), (err) => {
-// 		// 		/* istanbul ignore next */
-// 		// 		if (err) {
-// 		// 			reject();
-// 		// 		} else {
-// 		// 			resolve();
-// 		// 		}
-// 		// 	});
-// 		// });
-// 	};
-// 	filesystem.tasks.remove = (id: string): Promise<void> => {
-// 		// return new Promise<void>((resolve, reject) => {
-// 		// 	fs.unlink(path.join(settings.path, id), (err) => {
-// 		// 		/* istanbul ignore next */
-// 		// 		if (err) {
-// 		// 			reject();
-// 		// 		} else {
-// 		// 			resolve();
-// 		// 		}
-// 		// 	});
-// 		// });
-// 	};
-// 	mongo.tasks.clear = (): Promise<void> => {
-// 		// return new Promise<void>((resolve, reject) => {
-// 		// 	fs.readdir(path.join(settings.path), async (err, files: string[]) => {
-// 		// 		/* istanbul ignore next */
-// 		// 		if (err) {
-// 		// 			reject();
-// 		// 		}
+module.exports = async (settings: MongoDBPluginSettings): Promise<Plugin> => {
+	const mongo = new Plugin();
 
-// 		// 		function deleteFilePromise(file: string): Promise<void> {
-// 		// 			return new Promise<void>((resolve, reject) => {
-// 		// 				fs.unlink(path.join(settings.path, file), (err) => {
-// 		// 					/* istanbul ignore next */
-// 		// 					if (err) {
-// 		// 						reject();
-// 		// 					} else {
-// 		// 						resolve();
-// 		// 					}
-// 		// 				});
-// 		// 			});
-// 		// 		}
+	mongo.tasks.get = (id: string): Promise<any> => {
+		return new Promise<any>((resolve, reject) => {
+			settings.client.db(settings.db).collection(settings.collection).findOne({ key: id }, (err, result) => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve(result.value);
+				}
+			});
+		});
+	};
+	mongo.tasks.put = (id: string, data: any): Promise<void> => {
+		return new Promise<void>((resolve, reject) => {
+			settings.client.db(settings.db).collection(settings.collection).updateOne({ "key": id }, { "$set": { "value": data } }, {"upsert": true}, (err, result) => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve();
+				}
+			});
+		});
+	};
+	mongo.tasks.remove = (id: string): Promise<void> => {
+		return new Promise<void>((resolve, reject) => {
+			settings.client.db(settings.db).collection(settings.collection).deleteOne({ "key": id }, (err, result) => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve();
+				}
+			});
+		});
+	};
+	mongo.tasks.clear = (): Promise<void> => {
+		return new Promise<void>((resolve, reject) => {
+			settings.client.db(settings.db).collection(settings.collection).deleteMany({}, (err, result) => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve();
+				}
+			});
+		});
+	};
 
-// 		// 		try {
-// 		// 			await Promise.all(files.map((file: string) => deleteFilePromise(file)));
-// 		// 			resolve();
-// 		// 		} catch (e) {
-// 		// 			/* istanbul ignore next */
-// 		// 			reject();
-// 		// 		}
-// 		// 	});
-// 		// });
-// 	};
-
-// 	return mongo;
-// };
+	return mongo;
+};
