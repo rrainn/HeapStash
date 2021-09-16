@@ -1,4 +1,4 @@
-const HeapStash = require("../");
+const {HeapStash, Plugin} = require("../dist");
 
 describe("fetch()", () => {
 	let cache;
@@ -177,7 +177,7 @@ describe("fetch()", () => {
 		};
 
 		let count = 0;
-		const plugin = new HeapStash.Plugin();
+		const plugin = new Plugin();
 		plugin.tasks.get = async () => {
 			count++;
 
@@ -202,7 +202,7 @@ describe("fetch()", () => {
 			return new Promise(() => {});
 		};
 
-		const plugin = new HeapStash.Plugin();
+		const plugin = new Plugin();
 		plugin.tasks.get = async () => {
 			return new Promise((resolve) => {
 				finalize = () => {
@@ -231,7 +231,7 @@ describe("fetch()", () => {
 			return new Promise(() => {});
 		};
 
-		const plugin = new HeapStash.Plugin();
+		const plugin = new Plugin();
 		plugin.tasks.get = async () => {
 			return new Promise((resolve, reject) => {
 				finalize = () => {

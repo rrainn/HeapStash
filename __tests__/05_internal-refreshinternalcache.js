@@ -1,4 +1,4 @@
-const HeapStash = require("../");
+const {HeapStash} = require("../dist");
 
 describe("_.refreshinternalcache()", () => {
 	let cache;

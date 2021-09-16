@@ -1,7 +1,7 @@
 const AWS = require("aws-sdk");
-const Plugin = require("./");
+import { Plugin } from "./index";
 
-module.exports = (settings) => {
+export default (settings) => {
 	const plugin = new Plugin();
 	plugin._ = {...settings};
 
@@ -88,7 +88,7 @@ module.exports = (settings) => {
 	plugin.tasks.clear = async () => {
 		let items = [], lastEvaluatedKey;
 		do {
-			const obj = {"TableName": plugin._.tableName};
+			const obj: any = {"TableName": plugin._.tableName};
 			if (lastEvaluatedKey) {
 				obj.ExclusiveStartKey = lastEvaluatedKey;
 			}

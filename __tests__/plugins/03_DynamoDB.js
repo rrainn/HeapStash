@@ -1,7 +1,6 @@
-const HeapStash = require("../../");
-const DynamoDB = HeapStash.Plugin.DynamoDB;
+const {HeapStash} = require("../../dist");
+const DynamoDB = require("../../dist/plugin").DynamoDB.default;
 const AWS = require("aws-sdk");
-const DynamoDbLocal = require("dynamodb-local");
 const DYNAMO_DB_PORT = 8000;
 const nock = require("nock");
 
@@ -14,16 +13,6 @@ describe("DynamoDB", function() {
 	afterEach(() => {
 		nock.cleanAll();
 		nock.restore();
-	});
-
-	let dynamoLocal;
-	beforeAll(async function() {
-		dynamoLocal = await DynamoDbLocal.launch(DYNAMO_DB_PORT);
-	});
-	afterAll(() => {
-		if (dynamoLocal && dynamoLocal.pid) {
-			process.kill(dynamoLocal.pid);
-		}
 	});
 
 	let cache;

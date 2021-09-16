@@ -1,4 +1,4 @@
-const HeapStash = require("../");
+const {HeapStash, Plugin} = require("../dist");
 
 describe("put()", () => {
 	let cache;
@@ -106,7 +106,7 @@ describe("put()", () => {
 
 	it("Should not call any plugins if internalCacheOnly is set to true", async () => {
 		let called = false;
-		const plugin = new HeapStash.Plugin();
+		const plugin = new Plugin();
 		plugin.tasks.put = () => {
 			called = true;
 		};

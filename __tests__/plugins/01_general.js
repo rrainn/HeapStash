@@ -1,4 +1,4 @@
-const HeapStash = require("../../");
+const {HeapStash, Plugin} = require("../../dist");
 
 describe("Plugins", () => {
 	let cache;
@@ -9,29 +9,29 @@ describe("Plugins", () => {
 	});
 
 	it("Should have Plugin property", () => {
-		expect(HeapStash.Plugin).toBeOfType("function");
+		expect(Plugin).toBeOfType("function");
 	});
 
 	it("Should have run method on plugin instance", () => {
-		const plugin = new HeapStash.Plugin();
+		const plugin = new Plugin();
 
 		expect(plugin.run).toBeOfType("function");
 	});
 
 	it("Should have tasks object on plugin instance", () => {
-		const plugin = new HeapStash.Plugin();
+		const plugin = new Plugin();
 
 		expect(plugin.tasks).toEqual({});
 	});
 
 	it("Should return function when calling run", () => {
-		const plugin = new HeapStash.Plugin();
+		const plugin = new Plugin();
 
 		expect(plugin.run("test")).toBeOfType("function");
 	});
 
 	it("Should fail silently when trying to call run with invalid property", () => {
-		const plugin = new HeapStash.Plugin();
+		const plugin = new Plugin();
 
 		let error;
 		try {

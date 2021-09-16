@@ -1,12 +1,12 @@
-const fs = require("fs");
-const path = require("path");
-const Plugin = require("./");
+import * as path from "path";
+import * as fs from "fs";
+import { Plugin } from "./index";
 
-module.exports = (settings) => {
+export default (settings) => {
 	const filesystem = new Plugin();
 
-	filesystem.tasks.get = (id) => {
-		return new Promise((resolve, reject) => {
+	filesystem.tasks.get = (id: string): Promise<any> => {
+		return new Promise<any>((resolve, reject) => {
 			fs.readFile(path.join(settings.path, id), "utf8", (err, data) => {
 				if (data) {
 					try {
@@ -21,8 +21,8 @@ module.exports = (settings) => {
 			});
 		});
 	};
-	filesystem.tasks.put = (id, data) => {
-		return new Promise((resolve, reject) => {
+	filesystem.tasks.put = (id: string, data: any): Promise<void> => {
+		return new Promise<void>((resolve, reject) => {
 			fs.writeFile(path.join(settings.path, id), JSON.stringify(data), (err) => {
 				/* istanbul ignore next */
 				if (err) {
@@ -33,8 +33,8 @@ module.exports = (settings) => {
 			});
 		});
 	};
-	filesystem.tasks.remove = (id) => {
-		return new Promise((resolve, reject) => {
+	filesystem.tasks.remove = (id: string): Promise<void> => {
+		return new Promise<void>((resolve, reject) => {
 			fs.unlink(path.join(settings.path, id), (err) => {
 				/* istanbul ignore next */
 				if (err) {
@@ -45,16 +45,16 @@ module.exports = (settings) => {
 			});
 		});
 	};
-	filesystem.tasks.clear = () => {
-		return new Promise((resolve, reject) => {
-			fs.readdir(path.join(settings.path), async (err, files) => {
+	filesystem.tasks.clear = (): Promise<void> => {
+		return new Promise<void>((resolve, reject) => {
+			fs.readdir(path.join(settings.path), async (err, files: string[]) => {
 				/* istanbul ignore next */
 				if (err) {
 					reject();
 				}
 
-				function deleteFilePromise(file) {
-					return new Promise((resolve, reject) => {
+				function deleteFilePromise (file: string): Promise<void> {
+					return new Promise<void>((resolve, reject) => {
 						fs.unlink(path.join(settings.path, file), (err) => {
 							/* istanbul ignore next */
 							if (err) {
@@ -67,7 +67,7 @@ module.exports = (settings) => {
 				}
 
 				try {
-					await Promise.all(files.map((file) => deleteFilePromise(file)));
+					await Promise.all(files.map((file: string) => deleteFilePromise(file)));
 					resolve();
 				} catch (e) {
 					/* istanbul ignore next */
