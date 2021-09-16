@@ -9,7 +9,7 @@ export default (settings) => {
 	plugin._.ttlAttribute = plugin._.ttlAttribute || "ttl";
 	plugin._.dynamodb = plugin._.dynamodb || new AWS.DynamoDB();
 
-	plugin.tasks.get = async (id) => {
+	plugin.tasks.get = async (id: string) => {
 		const result = await plugin._.dynamodb.getItem({
 			"Key": {
 				[plugin._.primaryKey]: {
@@ -34,7 +34,7 @@ export default (settings) => {
 
 		return item;
 	};
-	plugin.tasks.put = async (id, data) => {
+	plugin.tasks.put = async (id: string, data: any) => {
 		data = {...data};
 		if (data.ttl) {
 			data.ttl = Math.round(data.ttl / 1000);
@@ -75,7 +75,7 @@ export default (settings) => {
 			}
 		}
 	};
-	plugin.tasks.remove = (id) => {
+	plugin.tasks.remove = (id: string) => {
 		return plugin._.dynamodb.deleteItem({
 			"Key": {
 				[plugin._.primaryKey]: {
