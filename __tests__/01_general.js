@@ -1,5 +1,4 @@
 const HeapStash = require("../");
-const {expect} = require("chai");
 
 describe("General", () => {
 	let cache;
@@ -11,7 +10,7 @@ describe("General", () => {
 		tests.forEach((test) => {
 			it(`Should store ${typeof test === "object" ? JSON.stringify(test) : test} correctly`, async () => {
 				await cache.put("item", test);
-				expect(await cache.get("item")).to.eql(test);
+				expect(await cache.get("item")).toEqual(test);
 			});
 		});
 	});

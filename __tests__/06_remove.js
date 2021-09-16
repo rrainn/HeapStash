@@ -1,12 +1,11 @@
 const HeapStash = require("../");
-const {expect} = require("chai");
 
 describe("remove()", () => {
 	let cache;
 	beforeEach(() => cache = new HeapStash());
 
 	it("Should be a function", () => {
-		expect(cache.remove).to.be.a("function");
+		expect(cache.remove).toBeOfType("function");
 	});
 
 	it("Should throw error if no ID passed in", async () => {
@@ -16,7 +15,7 @@ describe("remove()", () => {
 		} catch (e) {
 			error = e;
 		}
-		expect(error.message).to.eql("ID required to delete item from cache.");
+		expect(error.message).toEqual("ID required to delete item from cache.");
 	});
 
 	it("Should remove item from cache", async () => {
@@ -25,13 +24,13 @@ describe("remove()", () => {
 
 		await cache.remove("test");
 
-		expect(cache._.internalcache).to.eql({});
+		expect(cache._.internalcache).toEqual({});
 	});
 
 	it("Should fail silently if item not in cache", async () => {
 		await cache.remove("test");
 
-		expect(cache._.internalcache).to.eql({});
+		expect(cache._.internalcache).toEqual({});
 	});
 
 	it("Should fail silently if item not in cache array", async () => {
@@ -39,7 +38,7 @@ describe("remove()", () => {
 
 		await cache.remove("test");
 
-		expect(cache._.internalcache).to.eql({});
+		expect(cache._.internalcache).toEqual({});
 	});
 
 	it("Should not call any plugins if internalCacheOnly is set to true", async () => {
@@ -52,6 +51,6 @@ describe("remove()", () => {
 
 		await cache.remove("test", {"internalCacheOnly": true});
 
-		expect(called).to.be.false;
+		expect(called).toEqual(false);
 	});
 });

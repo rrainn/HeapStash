@@ -1,5 +1,4 @@
 const HeapStash = require("../../");
-const {expect} = require("chai");
 const FileSystem = require("../../lib/plugin/FileSystem");
 const path = require("path");
 const fs = require("fs");
@@ -37,19 +36,19 @@ describe("FileSystem", () => {
 		it("Should return correct item", async () => {
 			const res = await cache.get("id");
 
-			expect(res).to.eql({"myitem": "Hello World"});
+			expect(res).toEqual({"myitem": "Hello World"});
 		});
 
 		it("Should return undefined for item that does not exist", async () => {
 			const res = await cache.get("other");
 
-			expect(res).to.not.exist;
+			expect(res).toBeUndefined();
 		});
 
 		it("Should return undefined for item that is not a JSON object", async () => {
 			const res = await cache.get("id2");
 
-			expect(res).to.not.exist;
+			expect(res).toBeUndefined();
 		});
 	});
 
@@ -63,7 +62,7 @@ describe("FileSystem", () => {
 				} else {
 					try {
 						data = JSON.parse(data);
-						expect(data).to.eql({"data": {"myitem": "Hello World"}});
+						expect(data).toEqual({"data": {"myitem": "Hello World"}});
 						resolve();
 					} catch (e) {
 						reject(e);
@@ -84,16 +83,7 @@ describe("FileSystem", () => {
 
 		it("Should remove item from file system cache", async () => {
 			await cache.remove("id");
-
-			let error, data;
-			try {
-				data = fs.readFileSync(path.join(__dirname, "tmp", "id"), "utf8");
-			} catch (e) {
-				error = e;
-			}
-
-			expect(error.message).to.include("ENOENT: no such file or directory");
-			expect(data).to.not.exist;
+			expect(() => fs.readFileSync(path.join(__dirname, "tmp", "id"), "utf8")).toThrow("ENOENT: no such file or directory");
 		});
 
 		it("Should fail silently if no item in cache", async () => {
@@ -104,7 +94,7 @@ describe("FileSystem", () => {
 				error = e;
 			}
 
-			expect(error).to.not.exist;
+			expect(error).toBeUndefined();
 		});
 	});
 
@@ -119,16 +109,7 @@ describe("FileSystem", () => {
 
 		it("Should clear item from file system cache", async () => {
 			await cache.clear();
-
-			let error, data;
-			try {
-				data = fs.readFileSync(path.join(__dirname, "tmp", "id"), "utf8");
-			} catch (e) {
-				error = e;
-			}
-
-			expect(error.message).to.include("ENOENT: no such file or directory");
-			expect(data).to.not.exist;
+			expect(() => fs.readFileSync(path.join(__dirname, "tmp", "id"), "utf8")).toThrow("ENOENT: no such file or directory");
 		});
 
 		it("Should fail silently if no item in cache", async () => {
@@ -139,7 +120,7 @@ describe("FileSystem", () => {
 				error = e;
 			}
 
-			expect(error).to.not.exist;
+			expect(error).toBeUndefined();
 		});
 	});
 });

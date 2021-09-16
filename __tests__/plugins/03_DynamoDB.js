@@ -1,5 +1,4 @@
 const HeapStash = require("../../");
-const {expect} = require("chai");
 const DynamoDB = HeapStash.Plugin.DynamoDB;
 const AWS = require("aws-sdk");
 const DynamoDbLocal = require("dynamodb-local");
@@ -7,8 +6,6 @@ const DYNAMO_DB_PORT = 8000;
 const nock = require("nock");
 
 describe("DynamoDB", function() {
-	this.timeout(60000);
-
 	beforeEach(() => {
 		if (!nock.isActive()) {
 			nock.activate();
@@ -20,10 +17,10 @@ describe("DynamoDB", function() {
 	});
 
 	let dynamoLocal;
-	before(async function() {
+	beforeAll(async function() {
 		dynamoLocal = await DynamoDbLocal.launch(DYNAMO_DB_PORT);
 	});
-	after(() => {
+	afterAll(() => {
 		if (dynamoLocal && dynamoLocal.pid) {
 			process.kill(dynamoLocal.pid);
 		}
@@ -65,7 +62,7 @@ describe("DynamoDB", function() {
 
 	describe("General", () => {
 		it("Should use default DynamoDB instance if not passed in", () => {
-			expect(DynamoDB({})._.dynamodb).to.exist;
+			expect(DynamoDB({})._.dynamodb).toBeDefined();
 		});
 	});
 
@@ -82,19 +79,19 @@ describe("DynamoDB", function() {
 		it("Should return correct item", async () => {
 			const res = await cache.get("id");
 
-			expect(res).to.eql({"myitem": "Hello World"});
+			expect(res).toEqual({"myitem": "Hello World"});
 		});
 
 		it("Should return undefined for item that does not exist", async () => {
 			const res = await cache.get("other");
 
-			expect(res).to.not.exist;
+			expect(res).toBeUndefined();
 		});
 
 		it("Should return correct item that is not a JSON object", async () => {
 			const res = await cache.get("id2");
 
-			expect(res).to.eql("test");
+			expect(res).toEqual("test");
 		});
 
 		it("Should work with empty strings in object", async () => {
@@ -106,7 +103,7 @@ describe("DynamoDB", function() {
 
 			const res = await cache.get("mySpecialID");
 
-			expect(res).to.eql(obj);
+			expect(res).toEqual(obj);
 		});
 
 		describe("TTL", () => {
@@ -130,13 +127,13 @@ describe("DynamoDB", function() {
 					it("Should return correct item for ttl in the past", async () => {
 						const res = await cache.get("id3");
 
-						expect(res).to.not.exist;
+						expect(res).toBeUndefined();
 					});
 
 					it("Should return correct item for ttl in the future", async () => {
 						const res = await cache.get("id4");
 
-						expect(res).to.eql("test");
+						expect(res).toEqual("test");
 					});
 
 				});
@@ -158,7 +155,7 @@ describe("DynamoDB", function() {
 			}).promise()).Item);
 			delete dbItem.id;
 
-			expect(dbItem).to.eql({"data": {"myitem": "Hello World"}});
+			expect(dbItem).toEqual({"data": {"myitem": "Hello World"}});
 		});
 
 		it("Should work with empty strings", async () => {
@@ -178,7 +175,7 @@ describe("DynamoDB", function() {
 			}
 			delete dbItem._;
 
-			expect(dbItem).to.eql({"data": {"myitem": "Hello World", "myseconditem": "", "myobj": {"hello": "world", "str": ""}}});
+			expect(dbItem).toEqual({"data": {"myitem": "Hello World", "myseconditem": "", "myobj": {"hello": "world", "str": ""}}});
 		});
 
 		it("Should throw error if DynamoDB throw an error", async () => {
@@ -193,8 +190,8 @@ describe("DynamoDB", function() {
 				error = e;
 			}
 
-			expect(result).to.not.exist;
-			expect(error).to.exist;
+			expect(result).toBeUndefined();
+			expect(error).toBeDefined();
 		});
 
 		describe("TTL", () => {
@@ -223,8 +220,8 @@ describe("DynamoDB", function() {
 
 						const myttl = dbItem[prop];
 						delete dbItem[prop];
-						expect(myttl).to.be.within((Date.now() - DIFFERENCE_ALLOWED) / 1000, (Date.now() + DIFFERENCE_ALLOWED) / 1000);
-						expect(dbItem).to.eql({"data": {"myitem": "Hello World"}});
+						expect(myttl).toBeWithinRange((Date.now() - DIFFERENCE_ALLOWED) / 1000, (Date.now() + DIFFERENCE_ALLOWED) / 1000);
+						expect(dbItem).toEqual({"data": {"myitem": "Hello World"}});
 					});
 
 					it("Should use correct TTL for empty strings", async () => {
@@ -248,8 +245,8 @@ describe("DynamoDB", function() {
 
 						const myttl = dbItem[prop];
 						delete dbItem[prop];
-						expect(myttl).to.be.within((Date.now() - DIFFERENCE_ALLOWED) / 1000, (Date.now() + DIFFERENCE_ALLOWED) / 1000);
-						expect(dbItem).to.eql({"data": obj});
+						expect(myttl).toBeWithinRange((Date.now() - DIFFERENCE_ALLOWED) / 1000, (Date.now() + DIFFERENCE_ALLOWED) / 1000);
+						expect(dbItem).toEqual({"data": obj});
 					});
 				});
 			});
@@ -274,7 +271,7 @@ describe("DynamoDB", function() {
 				"TableName": "TestTable"
 			}).promise()).Item);
 
-			expect(data).to.eql({});
+			expect(data).toEqual({});
 		});
 
 		it("Should fail silently if no item in cache", async () => {
@@ -285,7 +282,7 @@ describe("DynamoDB", function() {
 				error = e;
 			}
 
-			expect(error).to.not.exist;
+			expect(error).toBeUndefined();
 		});
 	});
 
@@ -307,7 +304,7 @@ describe("DynamoDB", function() {
 				"TableName": "TestTable"
 			}).promise()).Item);
 
-			expect(data).to.eql({});
+			expect(data).toEqual({});
 		});
 
 		it("Should clear items from DynamoDB cache", async () => {
@@ -320,7 +317,7 @@ describe("DynamoDB", function() {
 			await cache.clear();
 
 			const data = (await dynamodb.scan({"TableName": "TestTable"}).promise()).Items;
-			expect(data).to.eql([]);
+			expect(data).toEqual([]);
 		});
 
 		it("Should fail silently if no item in cache", async () => {
@@ -331,7 +328,7 @@ describe("DynamoDB", function() {
 				error = e;
 			}
 
-			expect(error).to.not.exist;
+			expect(error).toBeUndefined();
 		});
 	});
 });

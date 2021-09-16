@@ -1,5 +1,4 @@
 const HeapStash = require("../");
-const {expect} = require("chai");
 
 describe("_.refreshinternalcache()", () => {
 	let cache;
@@ -10,7 +9,7 @@ describe("_.refreshinternalcache()", () => {
 
 		cache._.refreshinternalcache();
 
-		expect(cache._.internalcache).to.eql({});
+		expect(cache._.internalcache).toEqual({});
 	});
 
 	it("Should remove all items if ttl is in the past", () => {
@@ -20,7 +19,7 @@ describe("_.refreshinternalcache()", () => {
 
 		cache._.refreshinternalcache();
 
-		expect(cache._.internalcache).to.eql({});
+		expect(cache._.internalcache).toEqual({});
 	});
 
 	it("Should keep items in the future", () => {
@@ -32,6 +31,6 @@ describe("_.refreshinternalcache()", () => {
 
 		cache._.refreshinternalcache();
 
-		expect(Object.keys(cache._.internalcache).length).to.eql(2);
+		expect(Object.keys(cache._.internalcache).length).toEqual(2);
 	});
 });

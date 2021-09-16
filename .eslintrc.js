@@ -25,5 +25,16 @@ module.exports = {
 			"always"
 		],
 		"no-empty": "off"
-	}
+	},
+	"overrides": [
+		{
+			"files": [
+				"__tests__/**",
+				"testutils/**"
+			],
+			"env": {
+				"jest": true
+			},
+		}
+	]
 };

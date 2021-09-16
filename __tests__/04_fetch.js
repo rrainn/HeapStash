@@ -1,31 +1,30 @@
 const HeapStash = require("../");
-const {expect} = require("chai");
 
 describe("fetch()", () => {
 	let cache;
 	beforeEach(() => cache = new HeapStash());
 
 	it("Should be a function", () => {
-		expect(cache.fetch).to.be.a("function");
+		expect(cache.fetch).toBeOfType("function");
 	});
 
 	it("Should throw error if no ID passed in", () => {
-		expect(cache.fetch).to.throw("ID required to fetch item.");
+		expect(cache.fetch).toThrow("ID required to fetch item.");
 	});
 
 	it("Should throw error if no retrieveFunction passed in", () => {
-		expect(() => cache.fetch("test")).to.throw("Retrieve function required to fetch item.");
+		expect(() => cache.fetch("test")).toThrow("Retrieve function required to fetch item.");
 	});
 
 	it("Should return a promise", () => {
-		expect(cache.fetch("test", () => ({"data": "test"}))).to.be.a("promise");
+		expect(cache.fetch("test", () => ({"data": "test"}))).toBeInstanceOf(Promise);
 	});
 
 	it("Should return item from cache if exists", async () => {
 		cache.put("test", {"result": "data"});
 		const res = await cache.fetch("test", () => ({"result": "data"}));
 
-		expect(res).to.eql({"result": "data"});
+		expect(res).toEqual({"result": "data"});
 	});
 
 	it("Should put item in cache with custom ttl", async () => {
@@ -35,7 +34,7 @@ describe("fetch()", () => {
 			return "Hello World";
 		});
 
-		expect(cache._.internalcache["test"].ttl).to.be.within(Date.now() - DIFFERENCE_ALLOWED, Date.now() + DIFFERENCE_ALLOWED);
+		expect(cache._.internalcache["test"].ttl).toBeWithinRange(Date.now() - DIFFERENCE_ALLOWED, Date.now() + DIFFERENCE_ALLOWED);
 	});
 
 	it("Should put item in cache with no ttl", async () => {
@@ -44,7 +43,7 @@ describe("fetch()", () => {
 			return "Hello World";
 		});
 
-		expect(cache._.internalcache["test"].ttl).to.not.exist;
+		expect(cache._.internalcache["test"].ttl).toBeUndefined();
 	});
 
 	it("Should not use plugins for internalCacheOnly", async () => {
@@ -62,8 +61,8 @@ describe("fetch()", () => {
 			return expectResult;
 		});
 
-		expect(called).to.eql(0);
-		expect(result).to.eql(expectResult);
+		expect(called).toEqual(0);
+		expect(result).toEqual(expectResult);
 	});
 
 	it("Should call retrieveFunction if not in cache and not currently retrieving", async () => {
@@ -75,10 +74,10 @@ describe("fetch()", () => {
 			return {"result": "data"};
 		});
 
-		expect(calledRetrieveFunction).to.be.true;
-		expect(cacheinprogressfetchpromises).to.eql({"test": []});
-		expect(res).to.eql({"result": "data"});
-		expect(cache._.inprogressfetchpromises).to.eql({});
+		expect(calledRetrieveFunction).toEqual(true);
+		expect(cacheinprogressfetchpromises).toEqual({"test": []});
+		expect(res).toEqual({"result": "data"});
+		expect(cache._.inprogressfetchpromises).toEqual({});
 	});
 
 	it("Should call retrieveFunction if not in cache and not currently retrieving and handle throwing error correctly", async () => {
@@ -94,11 +93,11 @@ describe("fetch()", () => {
 			error = e;
 		}
 
-		expect(calledRetrieveFunction).to.be.true;
-		expect(cacheinprogressfetchpromises).to.eql({"test": []});
-		expect(res).to.not.exist;
-		expect(error.message).to.eql("Error");
-		expect(cache._.inprogressfetchpromises).to.eql({});
+		expect(calledRetrieveFunction).toEqual(true);
+		expect(cacheinprogressfetchpromises).toEqual({"test": []});
+		expect(res).toBeUndefined();
+		expect(error.message).toEqual("Error");
+		expect(cache._.inprogressfetchpromises).toEqual({});
 	});
 
 	it("Should add resolve and reject methods to array if pending action", (done) => {
@@ -111,11 +110,11 @@ describe("fetch()", () => {
 		cache.fetch("test", func);
 
 		setTimeout(() => {
-			expect(cache._.inprogressfetchpromises["test"]).to.be.an("array");
-			expect(cache._.inprogressfetchpromises["test"].length).to.eql(1);
-			expect(cache._.inprogressfetchpromises["test"][0].resolve).to.be.a("function");
-			expect(cache._.inprogressfetchpromises["test"][0].reject).to.be.a("function");
-			expect(counter).to.eql(1);
+			expect(cache._.inprogressfetchpromises["test"]).toBeInstanceOf(Array);
+			expect(cache._.inprogressfetchpromises["test"].length).toEqual(1);
+			expect(cache._.inprogressfetchpromises["test"][0].resolve).toBeOfType("function");
+			expect(cache._.inprogressfetchpromises["test"][0].reject).toBeOfType("function");
+			expect(counter).toEqual(1);
 
 			done();
 		}, 1);
@@ -136,8 +135,8 @@ describe("fetch()", () => {
 			finalize();
 			const res = await cache.fetch("test", func);
 
-			expect(res).to.eql({"data": "test"});
-			expect(cache._.inprogressfetchpromises).to.eql({});
+			expect(res).toEqual({"data": "test"});
+			expect(cache._.inprogressfetchpromises).toEqual({});
 
 			done();
 		}, 1);
@@ -154,9 +153,9 @@ describe("fetch()", () => {
 		};
 
 		function check() {
-			expect(error.message).to.eql("Error");
-			expect(res).to.not.exist;
-			expect(cache._.inprogressfetchpromises).to.eql({});
+			expect(error.message).toEqual("Error");
+			expect(res).toBeUndefined();
+			expect(cache._.inprogressfetchpromises).toEqual({});
 
 			done();
 		}
@@ -191,7 +190,7 @@ describe("fetch()", () => {
 		cache.fetch("test", func);
 
 		setTimeout(async () => {
-			expect(count).to.eql(1);
+			expect(count).toEqual(1);
 
 			done();
 		}, 1);
@@ -219,9 +218,9 @@ describe("fetch()", () => {
 		const resB = await cache.fetch("test", func);
 		const resC = await cache.fetch("test", func);
 
-		expect(resA).to.eql("test");
-		expect(resB).to.eql("test");
-		expect(resC).to.eql("test");
+		expect(resA).toEqual("test");
+		expect(resB).toEqual("test");
+		expect(resC).toEqual("test");
 	});
 
 	it("Should only call retrieveFunction once after plugin", (done) => {
@@ -247,12 +246,12 @@ describe("fetch()", () => {
 		cache.fetch("test", func);
 
 		setTimeout(() => {
-			expect(count).to.eql(0);
+			expect(count).toEqual(0);
 
 			finalize();
 
 			setTimeout(() => {
-				expect(count).to.eql(1);
+				expect(count).toEqual(1);
 
 				done();
 			}, 1);
@@ -270,8 +269,8 @@ describe("fetch()", () => {
 				return "Hello World";
 			});
 
-			expect(calledID).to.eql("test");
-			expect(cache._.internalcache["prefix_test"].data).to.eql("Hello World");
+			expect(calledID).toEqual("test");
+			expect(cache._.internalcache["prefix_test"].data).toEqual("Hello World");
 		});
 	});
 });

@@ -1,12 +1,11 @@
 const HeapStash = require("../");
-const {expect} = require("chai");
 
 describe("clear()", () => {
 	let cache;
 	beforeEach(() => cache = new HeapStash());
 
 	it("Should be a function", () => {
-		expect(cache.clear).to.be.a("function");
+		expect(cache.clear).toBeOfType("function");
 	});
 
 	it("Should clear item from cache", async () => {
@@ -15,8 +14,8 @@ describe("clear()", () => {
 
 		await cache.clear();
 
-		expect(cache._.internalcache).to.eql({});
-		expect(cache._.internalcachearray).to.eql([]);
+		expect(cache._.internalcache).toEqual({});
+		expect(cache._.internalcachearray).toEqual([]);
 	});
 
 	it("Should clear items from cache", async () => {
@@ -25,19 +24,19 @@ describe("clear()", () => {
 			cache._.internalcachearray.push(`test${item}`);
 		});
 
-		expect(cache._.internalcachearray.length).to.eql(50);
+		expect(cache._.internalcachearray.length).toEqual(50);
 
 		await cache.clear();
 
-		expect(cache._.internalcache).to.eql({});
-		expect(cache._.internalcachearray).to.eql([]);
+		expect(cache._.internalcache).toEqual({});
+		expect(cache._.internalcachearray).toEqual([]);
 	});
 
 	it("Should fail silently if nothing in cache", async () => {
 		await cache.clear();
 
-		expect(cache._.internalcache).to.eql({});
-		expect(cache._.internalcachearray).to.eql([]);
+		expect(cache._.internalcache).toEqual({});
+		expect(cache._.internalcachearray).toEqual([]);
 	});
 
 	it("Should not call any plugins if internalCacheOnly is set to true", async () => {
@@ -50,6 +49,6 @@ describe("clear()", () => {
 
 		await cache.clear({"internalCacheOnly": true});
 
-		expect(called).to.be.false;
+		expect(called).toEqual(false);
 	});
 });
