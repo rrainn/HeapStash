@@ -21,6 +21,6 @@ jobs:
     - run: npx eslint .
     - name: Setup DynamoDB Local
       uses: rrainn/dynamodb-action@v2.0.0
-    - run: npm test -- --coverage && cat ./tests/coverage/lcov.info | npx coveralls
+    - run: npm test -- --coverage && npx coveralls < coverage/lcov.info
       env:
         CI: true
