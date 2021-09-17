@@ -13,8 +13,14 @@ export = (settings: RedisPluginSettings): Plugin => {
 			settings.client.get(id, (err, result) => {
 				if (err) {
 					reject(err);
+				} else if (result) {
+					try {
+						resolve(JSON.parse(result));
+					} catch (e) {
+						resolve(result);
+					}
 				} else {
-					resolve(result ? JSON.parse(result) : null);
+					reject();
 				}
 			});
 		});
@@ -29,10 +35,17 @@ export = (settings: RedisPluginSettings): Plugin => {
 				}
 			};
 
-			if (data.ttl) {
-				settings.client.set(id, JSON.stringify(data), "EX", Math.round(data.ttl / 1000), callback);
+			let dataStr: string;
+			if (typeof data === "object") {
+				dataStr = JSON.stringify(data);
 			} else {
-				settings.client.set(id, JSON.stringify(data), callback);
+				dataStr = data;
+			}
+
+			if (data.ttl) {
+				settings.client.set(id, dataStr, "EX", Math.round((Date.now() - data.ttl) / 1000), callback);
+			} else {
+				settings.client.set(id, dataStr, callback);
 			}
 		});
 	};

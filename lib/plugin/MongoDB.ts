@@ -15,24 +15,27 @@ export = async (settings: MongoDBPluginSettings): Promise<Plugin> => {
 
 	mongo.tasks.get = (id: string): Promise<any> => {
 		return new Promise<any>((resolve, reject) => {
-			collection.findOne({ key: id }, (err, result) => {
+			collection.findOne({ id }, (err, result) => {
 				if (err) {
 					reject(err);
+				} else if (!result) {
+					reject();
 				} else {
-					resolve(result.value);
+					resolve(result);
 				}
 			});
 		});
 	};
 	mongo.tasks.put = (id: string, data: any): Promise<void> => {
 		return new Promise<void>((resolve, reject) => {
-			const updateObject: any = { "$set": { "value": data } };
+			const updateObject: any = { "$set": data };
 
 			if (data.ttl) {
-				updateObject.expireAt = new Date(data.ttl);
+				updateObject["$set"].expireAt = new Date(data.ttl);
+				delete data.ttl;
 			}
 
-			collection.updateOne({ "key": id }, updateObject, {"upsert": true}, (err, result) => {
+			collection.updateOne({ id }, updateObject, {"upsert": true}, (err, result) => {
 				if (err) {
 					reject(err);
 				} else {
@@ -43,7 +46,7 @@ export = async (settings: MongoDBPluginSettings): Promise<Plugin> => {
 	};
 	mongo.tasks.remove = (id: string): Promise<void> => {
 		return new Promise<void>((resolve, reject) => {
-			collection.deleteOne({ "key": id }, (err, result) => {
+			collection.deleteOne({ id }, (err, result) => {
 				if (err) {
 					reject(err);
 				} else {

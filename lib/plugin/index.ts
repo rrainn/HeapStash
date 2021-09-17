@@ -4,6 +4,7 @@ class Plugin {
 	static DynamoDB: any;
 	static FileSystem: any;
 	static MongoDB: any;
+	static Redis: any;
 
 	constructor () {
 		this.tasks = {};

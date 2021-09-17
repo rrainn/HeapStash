@@ -47,6 +47,7 @@
     "mongodb": "^4.1.2"
   },
   "devDependencies": {
+    "@shelf/jest-mongodb": "^2.0.3",
     "@types/debug": "^4.1.7",
     "@types/ioredis": "^4.27.2",
     "@types/node": "^16.9.1",

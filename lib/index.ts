@@ -247,10 +247,12 @@ import Plugin from "./plugin";
 import DynamoDB from "./plugin/DynamoDB";
 import FileSystem from "./plugin/FileSystem";
 import MongoDB from "./plugin/MongoDB";
+import Redis from "./plugin/Redis";
 
 Plugin.DynamoDB = DynamoDB;
 Plugin.FileSystem = FileSystem;
 Plugin.MongoDB = MongoDB;
+Plugin.Redis = Redis;
 
 HeapStash.Plugin = Plugin;
 
