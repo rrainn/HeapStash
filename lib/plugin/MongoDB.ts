@@ -10,9 +10,12 @@ interface MongoDBPluginSettings {
 export = async (settings: MongoDBPluginSettings): Promise<Plugin> => {
 	const mongo = new Plugin();
 
+	const collection = settings.client.db(settings.db).collection(settings.collection);
+	await collection.createIndex({ "expireAt": 1 }, { "expireAfterSeconds": 0 });
+
 	mongo.tasks.get = (id: string): Promise<any> => {
 		return new Promise<any>((resolve, reject) => {
-			settings.client.db(settings.db).collection(settings.collection).findOne({ key: id }, (err, result) => {
+			collection.findOne({ key: id }, (err, result) => {
 				if (err) {
 					reject(err);
 				} else {
@@ -23,7 +26,13 @@ export = async (settings: MongoDBPluginSettings): Promise<Plugin> => {
 	};
 	mongo.tasks.put = (id: string, data: any): Promise<void> => {
 		return new Promise<void>((resolve, reject) => {
-			settings.client.db(settings.db).collection(settings.collection).updateOne({ "key": id }, { "$set": { "value": data } }, {"upsert": true}, (err, result) => {
+			const updateObject: any = { "$set": { "value": data } };
+
+			if (data.ttl) {
+				updateObject.expireAt = new Date(data.ttl);
+			}
+
+			collection.updateOne({ "key": id }, updateObject, {"upsert": true}, (err, result) => {
 				if (err) {
 					reject(err);
 				} else {
@@ -34,7 +43,7 @@ export = async (settings: MongoDBPluginSettings): Promise<Plugin> => {
 	};
 	mongo.tasks.remove = (id: string): Promise<void> => {
 		return new Promise<void>((resolve, reject) => {
-			settings.client.db(settings.db).collection(settings.collection).deleteOne({ "key": id }, (err, result) => {
+			collection.deleteOne({ "key": id }, (err, result) => {
 				if (err) {
 					reject(err);
 				} else {
@@ -45,7 +54,7 @@ export = async (settings: MongoDBPluginSettings): Promise<Plugin> => {
 	};
 	mongo.tasks.clear = (): Promise<void> => {
 		return new Promise<void>((resolve, reject) => {
-			settings.client.db(settings.db).collection(settings.collection).deleteMany({}, (err, result) => {
+			collection.deleteMany({}, (err, result) => {
 				if (err) {
 					reject(err);
 				} else {

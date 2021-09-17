@@ -1,3 +1,7 @@
+import debug from "debug";
+const primaryDebugGet = debug("HeapStash:Plugin:DynamoDB:Get");
+const primaryDebugPut = debug("HeapStash:Plugin:DynamoDB:Put");
+
 const AWS = require("aws-sdk");
 import Plugin from "./index";
 
@@ -10,15 +14,19 @@ export = (settings) => {
 	plugin._.dynamodb = plugin._.dynamodb || new AWS.DynamoDB();
 
 	plugin.tasks.get = async (id: string) => {
-		const result = await plugin._.dynamodb.getItem({
+		const getItemRequest = {
 			"Key": {
 				[plugin._.primaryKey]: {
 					"S": id
 				}
 			},
 			"TableName": plugin._.tableName
-		}).promise();
+		};
+		primaryDebugGet("getItem request: %o", getItemRequest);
+		const result = await plugin._.dynamodb.getItem(getItemRequest).promise();
+		primaryDebugGet("getItem result: %o", result);
 		const item = AWS.DynamoDB.Converter.unmarshall(result.Item);
+		primaryDebugGet("unmarshall: %o", item);
 		if (item[plugin._.ttlAttribute]) {
 			item.ttl = item[plugin._.ttlAttribute] * 1000;
 		}
@@ -31,6 +39,8 @@ export = (settings) => {
 		}
 
 		delete item._;
+
+		primaryDebugGet("return item: %o", item);
 
 		return item;
 	};
@@ -49,10 +59,13 @@ export = (settings) => {
 				...data,
 				[plugin._.primaryKey]: id
 			});
-			await plugin._.dynamodb.putItem({
+			primaryDebugPut("marshalled object: %o", dynamoObject);
+			const putItemRequest = {
 				"Item": dynamoObject,
 				"TableName": plugin._.tableName
-			}).promise();
+			};
+			primaryDebugPut("putItem request: %o", putItemRequest);
+			await plugin._.dynamodb.putItem(putItemRequest).promise();
 		} catch (e) {
 			if (e.code === "ValidationException") {
 				const dynamoPreObject = {

@@ -248,9 +248,9 @@ import DynamoDB from "./plugin/DynamoDB";
 import FileSystem from "./plugin/FileSystem";
 import MongoDB from "./plugin/MongoDB";
 
-(Plugin as any).DynamoDB = DynamoDB;
-(Plugin as any).FileSystem = FileSystem;
-(Plugin as any).MongoDB = MongoDB;
+Plugin.DynamoDB = DynamoDB;
+Plugin.FileSystem = FileSystem;
+Plugin.MongoDB = MongoDB;
 
 HeapStash.Plugin = Plugin;
 

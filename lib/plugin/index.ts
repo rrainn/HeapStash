@@ -1,6 +1,9 @@
 class Plugin {
 	tasks: any;
 	_: any;
+	static DynamoDB: any;
+	static FileSystem: any;
+	static MongoDB: any;
 
 	constructor () {
 		this.tasks = {};

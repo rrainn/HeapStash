@@ -5,7 +5,7 @@ interface RedisPluginSettings {
 	client: Redis.Redis;
 }
 
-export = async (settings: RedisPluginSettings): Promise<Plugin> => {
+export = (settings: RedisPluginSettings): Plugin => {
 	const redis = new Plugin();
 
 	redis.tasks.get = (id: string): Promise<any> => {
@@ -21,13 +21,19 @@ export = async (settings: RedisPluginSettings): Promise<Plugin> => {
 	};
 	redis.tasks.put = (id: string, data: any): Promise<void> => {
 		return new Promise<void>((resolve, reject) => {
-			settings.client.set(id, JSON.stringify(data), (err) => {
+			const callback = (err) => {
 				if (err) {
 					reject(err);
 				} else {
 					resolve();
 				}
-			});
+			};
+
+			if (data.ttl) {
+				settings.client.set(id, JSON.stringify(data), "EX", Math.round(data.ttl / 1000), callback);
+			} else {
+				settings.client.set(id, JSON.stringify(data), callback);
+			}
 		});
 	};
 	redis.tasks.remove = (id: string): Promise<void> => {
