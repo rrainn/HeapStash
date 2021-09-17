@@ -1,4 +1,5 @@
-const {HeapStash, Plugin} = require("../../dist");
+const HeapStash = require("../../dist");
+const Plugin = HeapStash.Plugin;
 
 describe("Plugins", () => {
 	let cache;

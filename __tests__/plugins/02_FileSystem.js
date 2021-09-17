@@ -1,5 +1,5 @@
-const {HeapStash} = require("../../dist");
-const FileSystem = require("../../dist/plugin").FileSystem.default;
+const HeapStash = require("../../dist");
+const FileSystem = HeapStash.Plugin.FileSystem;
 const path = require("path");
 const fs = require("fs");
 const del = require("del");

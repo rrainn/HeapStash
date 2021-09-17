@@ -1,5 +1,5 @@
-const {HeapStash} = require("../../dist");
-const DynamoDB = require("../../dist/plugin").DynamoDB.default;
+const HeapStash = require("../../dist");
+const DynamoDB = HeapStash.Plugin.DynamoDB;
 const AWS = require("aws-sdk");
 const DYNAMO_DB_PORT = 8000;
 const nock = require("nock");

@@ -1,11 +1,11 @@
-import { Plugin } from "./index";
+import Plugin from "./index";
 import * as Redis from "ioredis";
 
 interface RedisPluginSettings {
 	client: Redis.Redis;
 }
 
-module.exports = async (settings: RedisPluginSettings): Promise<Plugin> => {
+export = async (settings: RedisPluginSettings): Promise<Plugin> => {
 	const redis = new Plugin();
 
 	redis.tasks.get = (id: string): Promise<any> => {

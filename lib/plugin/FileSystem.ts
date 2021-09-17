@@ -1,8 +1,8 @@
 import * as path from "path";
 import * as fs from "fs";
-import { Plugin } from "./index";
+import Plugin from "./index";
 
-export default (settings) => {
+export = (settings) => {
 	const filesystem = new Plugin();
 
 	filesystem.tasks.get = (id: string): Promise<any> => {

@@ -1,4 +1,4 @@
-export class Plugin {
+class Plugin {
 	tasks: any;
 	_: any;
 
@@ -16,12 +16,4 @@ export class Plugin {
 	}
 }
 
-import * as DynamoDB from "./DynamoDB";
-import * as FileSystem from "./FileSystem";
-import * as MongoDB from "./MongoDB";
-
-export {
-	DynamoDB,
-	FileSystem,
-	MongoDB
-};
+export = Plugin;

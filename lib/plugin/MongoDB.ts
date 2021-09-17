@@ -1,4 +1,4 @@
-import { Plugin } from "./index";
+import Plugin from "./index";
 import { MongoClient } from "mongodb";
 
 interface MongoDBPluginSettings {
@@ -7,7 +7,7 @@ interface MongoDBPluginSettings {
 	collection: string;
 }
 
-module.exports = async (settings: MongoDBPluginSettings): Promise<Plugin> => {
+export = async (settings: MongoDBPluginSettings): Promise<Plugin> => {
 	const mongo = new Plugin();
 
 	mongo.tasks.get = (id: string): Promise<any> => {

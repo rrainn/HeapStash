@@ -9,7 +9,9 @@
 		"declaration": true,
 		"noImplicitThis": true,
 		"strict": false,
-		"allowJs": true
+		"allowJs": true,
+		"removeComments": false,
+		"esModuleInterop": true
 	},
 	"include": ["./lib/**/*"],
 }

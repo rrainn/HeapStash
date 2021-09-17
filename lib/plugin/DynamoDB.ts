@@ -1,7 +1,7 @@
 const AWS = require("aws-sdk");
-import { Plugin } from "./index";
+import Plugin from "./index";
 
-export default (settings) => {
+export = (settings) => {
 	const plugin = new Plugin();
 	plugin._ = {...settings};
 

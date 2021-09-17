@@ -29,6 +29,7 @@ class HeapStash {
 	settings: HeapStashSettings;
 	plugins: any[];
 	_: any;
+	static Plugin: typeof Plugin;
 
 	constructor (settings: HeapStashSettings = {}) {
 		primaryDebug(`Creating cache instance with settings: ${JSON.stringify(settings)}`);
@@ -241,8 +242,16 @@ class HeapStash {
 	}
 }
 
-import {Plugin} from "./plugin";
-export {
-	Plugin,
-	HeapStash
-};
+import Plugin from "./plugin";
+
+import DynamoDB from "./plugin/DynamoDB";
+import FileSystem from "./plugin/FileSystem";
+import MongoDB from "./plugin/MongoDB";
+
+(Plugin as any).DynamoDB = DynamoDB;
+(Plugin as any).FileSystem = FileSystem;
+(Plugin as any).MongoDB = MongoDB;
+
+HeapStash.Plugin = Plugin;
+
+export = HeapStash;

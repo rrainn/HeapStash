@@ -1,4 +1,4 @@
-const {HeapStash} = require("../dist");
+const HeapStash = require("../dist");
 
 describe("General", () => {
 	let cache;
