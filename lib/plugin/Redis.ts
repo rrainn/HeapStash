@@ -17,7 +17,7 @@ export = (settings: RedisPluginSettings): Plugin => {
 		}
 	};
 	redis.tasks.put = async (id: string, data: any): Promise<void> => {
-		let dataStr: string = JSON.stringify(data);
+		const dataStr: string = JSON.stringify(data);
 
 		if (data.ttl) {
 			await settings.client.set(id, dataStr, "EX", Math.round((Date.now() - data.ttl) / 1000));
