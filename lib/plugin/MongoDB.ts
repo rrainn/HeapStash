@@ -13,58 +13,29 @@ export = async (settings: MongoDBPluginSettings): Promise<Plugin> => {
 	const collection = settings.client.db(settings.db).collection(settings.collection);
 	await collection.createIndex({ "expireAt": 1 }, { "expireAfterSeconds": 0 });
 
-	mongo.tasks.get = (id: string): Promise<any> => {
-		return new Promise<any>((resolve, reject) => {
-			collection.findOne({ id }, (err, result) => {
-				if (err) {
-					reject(err);
-				} else if (!result) {
-					reject();
-				} else {
-					resolve(result);
-				}
-			});
-		});
+	mongo.tasks.get = async (id: string): Promise<any> => {
+		const result = await collection.findOne({ id });
+		if (!result) {
+			throw new Error("");
+		} else {
+			return result;
+		}
 	};
-	mongo.tasks.put = (id: string, data: any): Promise<void> => {
-		return new Promise<void>((resolve, reject) => {
-			const updateObject: any = { "$set": data };
+	mongo.tasks.put = async (id: string, data: any): Promise<void> => {
+		const updateObject: any = { "$set": data };
 
-			if (data.ttl) {
-				updateObject["$set"].expireAt = new Date(data.ttl);
-				delete data.ttl;
-			}
+		if (data.ttl) {
+			updateObject["$set"].expireAt = new Date(data.ttl);
+			delete data.ttl;
+		}
 
-			collection.updateOne({ id }, updateObject, {"upsert": true}, (err, result) => {
-				if (err) {
-					reject(err);
-				} else {
-					resolve();
-				}
-			});
-		});
+		await collection.updateOne({ id }, updateObject, {"upsert": true});
 	};
-	mongo.tasks.remove = (id: string): Promise<void> => {
-		return new Promise<void>((resolve, reject) => {
-			collection.deleteOne({ id }, (err, result) => {
-				if (err) {
-					reject(err);
-				} else {
-					resolve();
-				}
-			});
-		});
+	mongo.tasks.remove = async (id: string): Promise<void> => {
+		await collection.deleteOne({ id });
 	};
-	mongo.tasks.clear = (): Promise<void> => {
-		return new Promise<void>((resolve, reject) => {
-			collection.deleteMany({}, (err, result) => {
-				if (err) {
-					reject(err);
-				} else {
-					resolve();
-				}
-			});
-		});
+	mongo.tasks.clear = async (): Promise<void> => {
+		await collection.deleteMany({});
 	};
 
 	return mongo;
