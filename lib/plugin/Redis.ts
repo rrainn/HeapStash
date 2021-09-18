@@ -11,22 +11,13 @@ export = (settings: RedisPluginSettings): Plugin => {
 	redis.tasks.get = async (id: string): Promise<any> => {
 		const result = await settings.client.get(id);
 		if (result) {
-			try {
-				return JSON.parse(result);
-			} catch (e) {
-				return result;
-			}
+			return JSON.parse(result);
 		} else {
 			throw new Error();
 		}
 	};
 	redis.tasks.put = async (id: string, data: any): Promise<void> => {
-		let dataStr: string;
-		if (typeof data === "object") {
-			dataStr = JSON.stringify(data);
-		} else {
-			dataStr = data;
-		}
+		let dataStr: string = JSON.stringify(data);
 
 		if (data.ttl) {
 			await settings.client.set(id, dataStr, "EX", Math.round((Date.now() - data.ttl) / 1000));
