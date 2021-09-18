@@ -1,6 +1,6 @@
 const HeapStash = require("../../dist");
 const MongoDB = HeapStash.Plugin.MongoDB;
-const {MongoClient} = require('mongodb');
+const {MongoClient} = require("mongodb");
 
 describe("MongoDB", function () {
 	let connection, db, cache, collectionName;
