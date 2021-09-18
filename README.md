@@ -114,6 +114,24 @@ This method returns a plugin instance of the DynamoDB plugin. You must pass in `
 
 You must create your DynamoDB table prior to using this plugin.
 
+### HeapStash.Plugin.MongoDB(settings)
+
+This method returns a plugin instance of the MongoDB plugin. You must pass in `settings` as an object with the following properties:
+
+- `client` - The MongoDB client
+- `db` - The database you wish to connect to
+- `collection` - The name of the collection you wish to use
+
+You must run `client.connect` and `client.disconnect` yourself when using this plugin.
+
+### HeapStash.Plugin.Redis(settings)
+
+This method returns a plugin instance of the Redis plugin. You must pass in `settings` as an object with the following properties:
+
+- `client` - The Redis client
+
+You must run `client.connect` and `client.disconnect` yourself when using this plugin.
+
 ## Other Information
 
 ### debug
