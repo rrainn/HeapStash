@@ -5,6 +5,13 @@ const primaryDebugPut = debug("HeapStash:Plugin:DynamoDB:Put");
 const AWS = require("aws-sdk");
 import Plugin from "./index";
 
+function awsWrapper(func) {
+	if (func.promise) {
+		return func.promise();
+	} else {
+		return func;
+	}
+}
 export = (settings) => {
 	const plugin = new Plugin();
 	plugin._ = {...settings};
@@ -23,7 +30,7 @@ export = (settings) => {
 			"TableName": plugin._.tableName
 		};
 		primaryDebugGet("getItem request: %o", getItemRequest);
-		const result = await plugin._.dynamodb.getItem(getItemRequest).promise();
+		const result = await awsWrapper(plugin._.dynamodb.getItem(getItemRequest));
 		primaryDebugGet("getItem result: %o", result);
 		const item = AWS.DynamoDB.Converter.unmarshall(result.Item);
 		primaryDebugGet("unmarshall: %o", item);
@@ -65,7 +72,7 @@ export = (settings) => {
 				"TableName": plugin._.tableName
 			};
 			primaryDebugPut("putItem request: %o", putItemRequest);
-			await plugin._.dynamodb.putItem(putItemRequest).promise();
+			await awsWrapper(plugin._.dynamodb.putItem(putItemRequest));
 		} catch (e) {
 			if (e.code === "ValidationException") {
 				const dynamoPreObject = {
@@ -79,24 +86,24 @@ export = (settings) => {
 					dynamoPreObject[plugin._.ttlAttribute] = data[plugin._.ttlAttribute];
 				}
 				const dynamoObject = AWS.DynamoDB.Converter.marshall(dynamoPreObject);
-				await plugin._.dynamodb.putItem({
+				await awsWrapper(plugin._.dynamodb.putItem({
 					"Item": dynamoObject,
 					"TableName": plugin._.tableName
-				}).promise();
+				}));
 			} else {
 				throw e;
 			}
 		}
 	};
 	plugin.tasks.remove = (id: string) => {
-		return plugin._.dynamodb.deleteItem({
+		return awsWrapper(plugin._.dynamodb.deleteItem({
 			"Key": {
 				[plugin._.primaryKey]: {
 					"S": id
 				}
 			},
 			"TableName": plugin._.tableName
-		}).promise();
+		}));
 	};
 	plugin.tasks.clear = async () => {
 		let items = [], lastEvaluatedKey;
@@ -105,12 +112,12 @@ export = (settings) => {
 			if (lastEvaluatedKey) {
 				obj.ExclusiveStartKey = lastEvaluatedKey;
 			}
-			const res = await plugin._.dynamodb.scan(obj).promise();
+			const res = await awsWrapper(plugin._.dynamodb.scan(obj));
 			items = [...items, ...res.Items];
 			lastEvaluatedKey = res.LastEvaluatedKey;
 		} while (lastEvaluatedKey);
 
-		await Promise.all(items.map((item) => item.id).map((id) => plugin._.dynamodb.deleteItem({"Key": {id}, "TableName": plugin._.tableName}).promise()));
+		await Promise.all(items.map((item) => item.id).map((id) => awsWrapper(plugin._.dynamodb.deleteItem({"Key": {id}, "TableName": plugin._.tableName}))));
 	};
 
 	return plugin;
