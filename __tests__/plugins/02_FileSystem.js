@@ -70,6 +70,24 @@ describe("FileSystem", () => {
 				}
 			}));
 		});
+
+		it("Should put item in file system cache with different ttl", async () => {
+			await cache.put("id", {"myitem": "Hello World", "pluginTTL": 500});
+
+			return new Promise((resolve, reject) => fs.readFile(path.join(__dirname, "tmp", "id"), "utf8", (err, data) => {
+				if (err) {
+					reject(err);
+				} else {
+					try {
+						data = JSON.parse(data);
+						expect(data).toEqual({"data": {"myitem": "Hello World"}, "ttl": 500});
+						resolve();
+					} catch (e) {
+						reject(e);
+					}
+				}
+			}));
+		});
 	});
 
 	describe("remove()", () => {
