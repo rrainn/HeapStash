@@ -198,15 +198,15 @@ class HeapStash {
 
 		if (!settings.internalCacheOnly) {
 			primaryDebugPut(`Storing item in plugins: ${JSON.stringify(storedObject)}`);
-			// if (settings.pluginTTL !== undefined && settings.pluginTTL !== ttlToUse) {
-			// 	if (settings.pluginTTL === false) {
-			// 		primaryDebugPut("Deleting ttl for plugin storage.");
-			// 		delete storedObject.ttl;
-			// 	} else {
-			// 		primaryDebugPut(`Setting ttl to ${settings.pluginTTL} for plugin storage.`);
-			// 		storedObject.ttl = settings.pluginTTL;
-			// 	}
-			// }
+			if (settings.pluginTTL !== undefined && settings.pluginTTL !== ttlToUse) {
+				if (settings.pluginTTL === false) {
+					primaryDebugPut("Deleting ttl for plugin storage.");
+					delete storedObject.ttl;
+				} else {
+					primaryDebugPut(`Setting ttl to ${settings.pluginTTL} for plugin storage.`);
+					storedObject.ttl = settings.pluginTTL;
+				}
+			}
 			await Promise.all(this.plugins.map((plugin) => plugin.run("put")(id, storedObject)));
 			primaryDebugPut("Done storing item in plugins.");
 		} else {
