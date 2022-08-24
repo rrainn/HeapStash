@@ -5,7 +5,7 @@ const primaryDebugPut = debug("HeapStash:Plugin:DynamoDB:Put");
 const AWS = require("aws-sdk");
 import Plugin from "./index";
 
-function awsWrapper(func) {
+function awsWrapper (func) {
 	if (func.promise) {
 		return func.promise();
 	} else {
