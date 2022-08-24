@@ -20,8 +20,9 @@ interface ActionSettings {
 type GetSettings = ActionSettings;
 interface PutSettings extends ActionSettings {
 	ttl?: number | false;
+	pluginTTL?: number | false;
 }
-type FetchSettings = ActionSettings;
+type FetchSettings = PutSettings;
 type RemoveSettings = ActionSettings;
 type ClearSettings = ActionSettings;
 
@@ -93,9 +94,9 @@ class HeapStash {
 			}
 		}
 	}
-	fetch (id: string, retrieveFunction: (id: string) => Promise<any>);
-	fetch (id: string, settings: FetchSettings, retrieveFunction: (id: string) => Promise<any>);
-	fetch (id: string, settings: FetchSettings | ((id: string) => Promise<any>), retrieveFunction?: (id: string) => Promise<any>) {
+	async fetch (id: string, retrieveFunction: (id: string) => Promise<any>);
+	async fetch (id: string, settings: FetchSettings, retrieveFunction: (id: string) => Promise<any>);
+	async fetch (id: string, settings: FetchSettings | ((id: string) => Promise<any>), retrieveFunction?: (id: string) => Promise<any>) {
 		primaryDebugFetch(`Fetching item with ID: ${id}`);
 		if (!id) {
 			throw new Error("ID required to fetch item.");
@@ -186,8 +187,9 @@ class HeapStash {
 		}
 
 		const storedObject: any = {"data": item};
-		if ((settings.ttl || this.settings.ttl) && settings.ttl !== false) {
-			storedObject.ttl = Date.now() + (settings.ttl || this.settings.ttl);
+		const ttlToUse = settings.ttl || this.settings.ttl;
+		if (ttlToUse && settings.ttl !== false) {
+			storedObject.ttl = Date.now() + ttlToUse;
 			primaryDebugPut(`Adding TTL: ${storedObject.ttl}`);
 		}
 		primaryDebugPut(`Storing item in cache: ${JSON.stringify(storedObject)}`);
@@ -196,6 +198,15 @@ class HeapStash {
 
 		if (!settings.internalCacheOnly) {
 			primaryDebugPut(`Storing item in plugins: ${JSON.stringify(storedObject)}`);
+			if (settings.pluginTTL !== ttlToUse) {
+				if (settings.pluginTTL === false) {
+					primaryDebugPut("Deleting ttl for plugin storage.");
+					delete storedObject.ttl;
+				} else {
+					primaryDebugPut(`Setting ttl to ${settings.pluginTTL} for plugin storage.`);
+					storedObject.ttl = settings.pluginTTL;
+				}
+			}
 			await Promise.all(this.plugins.map((plugin) => plugin.run("put")(id, storedObject)));
 			primaryDebugPut("Done storing item in plugins.");
 		} else {
