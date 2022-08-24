@@ -94,9 +94,9 @@ class HeapStash {
 			}
 		}
 	}
-	fetch (id: string, retrieveFunction: (id: string) => Promise<any>);
-	fetch (id: string, settings: FetchSettings, retrieveFunction: (id: string) => Promise<any>);
-	fetch (id: string, settings: FetchSettings | ((id: string) => Promise<any>), retrieveFunction?: (id: string) => Promise<any>) {
+	fetch (id: string, retrieveFunction: (id: string) => Promise<any>): Promise<any>;
+	fetch (id: string, settings: FetchSettings, retrieveFunction: (id: string) => Promise<any>): Promise<any>;
+	fetch (id: string, settings: FetchSettings | ((id: string) => Promise<any>), retrieveFunction?: (id: string) => Promise<any>): Promise<any> {
 		primaryDebugFetch(`Fetching item with ID: ${id}`);
 		if (!id) {
 			throw new Error("ID required to fetch item.");
