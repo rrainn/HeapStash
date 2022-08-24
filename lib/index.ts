@@ -198,7 +198,7 @@ class HeapStash {
 
 		if (!settings.internalCacheOnly) {
 			primaryDebugPut(`Storing item in plugins: ${JSON.stringify(storedObject)}`);
-			if (settings.pluginTTL !== ttlToUse) {
+			if (settings.pluginTTL !== undefined && settings.pluginTTL !== ttlToUse) {
 				if (settings.pluginTTL === false) {
 					primaryDebugPut("Deleting ttl for plugin storage.");
 					delete storedObject.ttl;
