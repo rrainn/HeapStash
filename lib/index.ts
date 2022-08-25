@@ -64,7 +64,7 @@ class HeapStash {
 			primaryDebugGet(`Changing ID to include idPrefix. New ID: ${id}`);
 		}
 
-		function checkItem(item) {
+		function checkItem (item) {
 			if (item) {
 				primaryDebugGet(`Got item: ${JSON.stringify(item)}`);
 				if (typeof item.ttl === "number") {
