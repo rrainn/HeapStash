@@ -244,7 +244,7 @@ describe("fetch()", () => {
 		};
 		cache.plugins.push(plugin);
 
-		setTimeout(() => finalize(), 100);
+		setTimeout(() => finalize(), 50);
 
 		await cache.fetch("test", func);
 
