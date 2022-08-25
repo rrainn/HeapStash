@@ -200,24 +200,30 @@ describe("fetch()", () => {
 	it("Should only call plugin once and resolve correctly", async () => {
 		let finalize;
 		const func = () => {
-			return new Promise(() => {});
+			return new Promise((resolve) => {
+				return resolve("test");
+			});
 		};
 
 		const plugin = new Plugin();
 		plugin.tasks.get = async () => {
 			return new Promise((resolve) => {
+				console.log("HERE 3");
 				finalize = () => {
+					console.log("HERE 4");
 					resolve({"data": "test"});
 				};
 			});
 		};
 		cache.plugins.push(plugin);
 
-		setTimeout(() => finalize(), 50);
+		setTimeout(() => finalize(), 100);
 
+		console.log("HERE 1");
 		const resA = await cache.fetch("test", func);
 		const resB = await cache.fetch("test", func);
 		const resC = await cache.fetch("test", func);
+		console.log("HERE 2");
 
 		expect(resA).toEqual("test");
 		expect(resB).toEqual("test");
