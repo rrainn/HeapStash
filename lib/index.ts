@@ -198,9 +198,10 @@ class HeapStash {
 		}
 
 		const storedObject: any = {"data": item};
+		const currentTime = Date.now();
 		const ttlToUse = settings.ttl || this.settings.ttl;
 		if (ttlToUse && settings.ttl !== false) {
-			storedObject.ttl = Date.now() + ttlToUse;
+			storedObject.ttl = currentTime + ttlToUse;
 			primaryDebugPut(`Adding TTL: ${storedObject.ttl}`);
 		}
 		primaryDebugPut(`Storing item in cache: ${JSON.stringify(storedObject)}`);
@@ -208,17 +209,18 @@ class HeapStash {
 		this._.internalcachearray.push(id);
 
 		if (!settings.internalCacheOnly) {
-			primaryDebugPut(`Storing item in plugins: ${JSON.stringify(storedObject)}`);
+			const pluginStoredObject = {...storedObject};
 			if (settings.pluginTTL !== undefined && settings.pluginTTL !== ttlToUse) {
 				if (settings.pluginTTL === false) {
 					primaryDebugPut("Deleting ttl for plugin storage.");
-					delete storedObject.ttl;
+					delete pluginStoredObject.ttl;
 				} else {
 					primaryDebugPut(`Setting ttl to ${settings.pluginTTL} for plugin storage.`);
-					storedObject.ttl = settings.pluginTTL;
+					pluginStoredObject.ttl = currentTime + settings.pluginTTL;
 				}
 			}
-			await Promise.all(this.plugins.map((plugin) => plugin.run("put")(id, storedObject)));
+			primaryDebugPut(`Storing item in plugins: ${JSON.stringify(pluginStoredObject)}`);
+			await Promise.all(this.plugins.map((plugin) => plugin.run("put")(id, pluginStoredObject)));
 			primaryDebugPut("Done storing item in plugins.");
 		} else {
 			primaryDebugPut("Not storing item from plugins since internalCacheOnly is set to false.");
