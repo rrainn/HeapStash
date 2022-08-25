@@ -144,6 +144,7 @@ class HeapStash {
 				let result, inprogressfetchpromises;
 				let action = resolve;
 				try {
+					let didRunRetrieveFunction = false;
 					if (!(settings as FetchSettings).internalCacheOnly) {
 						primaryDebugFetch("Running get plugin with plugins");
 						try {
@@ -153,10 +154,15 @@ class HeapStash {
 					if (!result) {
 						primaryDebugFetch("Running retrieve function");
 						result = await retrieveFunction(id);
+						didRunRetrieveFunction = true;
 						primaryDebugFetch("Done running retrieve function");
-						primaryDebugFetch(`Got result from retrieveFunction, putting item: ${result}`);
-						await this.put(id, result, settings as any);
 					}
+					primaryDebugFetch(`Got result from retrieveFunction, putting item: ${result}`);
+					const putSettings: any = {...settings};
+					if (!putSettings.internalCacheOnly && !didRunRetrieveFunction) {
+						putSettings.internalCacheOnly = true;
+					}
+					await this.put(id, result, putSettings);
 					inprogressfetchpromises = this._.inprogressfetchpromises[internalID].map((item) => item.resolve);
 				} catch (e) {
 					primaryDebugFetch(`Got error from retrieveFunction: ${e}`);

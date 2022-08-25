@@ -224,6 +224,33 @@ describe("fetch()", () => {
 		expect(resC).toEqual("test");
 	});
 
+	it("Should not put on plugin if already exists in plugin", async () => {
+		let finalize;
+		const func = () => {
+			return new Promise(() => {});
+		};
+
+		const plugin = new Plugin();
+		plugin.tasks.get = async () => {
+			return new Promise((resolve) => {
+				finalize = () => {
+					resolve({"data": "test"});
+				};
+			});
+		};
+		let timesPutCalled = 0;
+		plugin.tasks.put = () => {
+			timesPutCalled++;
+		};
+		cache.plugins.push(plugin);
+
+		setTimeout(() => finalize(), 100);
+
+		await cache.fetch("test", func);
+
+		expect(timesPutCalled).toEqual(0);
+	});
+
 	it("Should only call retrieveFunction once after plugin", (done) => {
 		let finalize;
 		let count = 0;
