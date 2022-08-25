@@ -64,9 +64,31 @@ class HeapStash {
 			primaryDebugGet(`Changing ID to include idPrefix. New ID: ${id}`);
 		}
 
+		function checkItem(item) {
+			if (item) {
+				primaryDebugGet(`Got item: ${JSON.stringify(item)}`);
+				if (typeof item.ttl === "number") {
+					if (item.ttl > Date.now()) {
+						primaryDebugGet(`Returning item: ${item.data}`);
+						return item.data;
+					} else {
+						primaryDebugGet("TTL in past, item expired. Not returning anything.");
+					}
+				} else {
+					primaryDebugGet(`Returning item: ${item.data}`);
+					return item.data;
+				}
+			} else {
+				primaryDebugGet("No item passed into checkItem. Not returning anything.");
+			}
+		}
+
 		let item = this._.internalcache[id];
 		primaryDebugGet(`Item in internal cache: ${item}`);
-		if (!item && !settings.internalCacheOnly) {
+		let checkItemResult = checkItem(item);
+		if (checkItemResult) {
+			return checkItemResult;
+		} else if (!settings.internalCacheOnly) {
 			primaryDebugGet("Item not in internal cache, running plugins.");
 			for (let i = 0; i < this.plugins.length; i++) {
 				const plugin = this.plugins[i];
@@ -74,24 +96,13 @@ class HeapStash {
 					const result = await plugin.run("get")(id);
 					primaryDebugGet(`Found item using cache plugins: ${result}`);
 					item = result;
-					break;
+					checkItemResult = checkItem(item);
+					if (checkItemResult) {
+						return checkItemResult;
+					}
 				} catch (e) {}
 			}
 			primaryDebugGet("Done running plugins.");
-		}
-		if (item) {
-			primaryDebugGet(`Got item: ${JSON.stringify(item)}`);
-			if (typeof item.ttl === "number") {
-				if (item.ttl > Date.now()) {
-					primaryDebugGet(`Returning item: ${item.data}`);
-					return item.data;
-				} else {
-					primaryDebugGet("TTL in past, item expired. Not returning anything.");
-				}
-			} else {
-				primaryDebugGet(`Returning item: ${item.data}`);
-				return item.data;
-			}
 		}
 	}
 	fetch (id: string, retrieveFunction: (id: string) => Promise<any>): Promise<any>;
