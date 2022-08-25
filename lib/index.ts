@@ -65,17 +65,21 @@ class HeapStash {
 		}
 
 		function checkItem (item) {
-			primaryDebugGet(`Got item: ${JSON.stringify(item)}`);
-			if (typeof item.ttl === "number") {
-				if (item.ttl > Date.now()) {
-					primaryDebugGet(`Returning item: ${item.data}`);
-					return item.data;
+			if (item) {
+				primaryDebugGet(`Got item: ${JSON.stringify(item)}`);
+				if (typeof item.ttl === "number") {
+					if (item.ttl > Date.now()) {
+						primaryDebugGet(`Returning item: ${item}`);
+						return item;
+					} else {
+						primaryDebugGet("TTL in past, item expired. Not returning anything.");
+					}
 				} else {
-					primaryDebugGet("TTL in past, item expired. Not returning anything.");
+					primaryDebugGet(`Returning item: ${item}`);
+					return item;
 				}
 			} else {
-				primaryDebugGet(`Returning item: ${item.data}`);
-				return item.data;
+				primaryDebugGet("No item passed into checkItem. Not returning anything.");
 			}
 		}
 
@@ -83,7 +87,7 @@ class HeapStash {
 		primaryDebugGet(`Item in internal cache: ${item}`);
 		let checkItemResult = checkItem(item);
 		if (checkItemResult) {
-			return checkItemResult;
+			return checkItemResult.data;
 		} else if (!settings.internalCacheOnly) {
 			primaryDebugGet("Item not in internal cache, running plugins.");
 			for (let i = 0; i < this.plugins.length; i++) {
@@ -94,7 +98,7 @@ class HeapStash {
 					item = result;
 					checkItemResult = checkItem(item);
 					if (checkItemResult) {
-						return checkItemResult;
+						return checkItemResult.data;
 					}
 				} catch (e) {}
 			}
