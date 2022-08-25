@@ -198,6 +198,8 @@ describe("fetch()", () => {
 	});
 
 	it("Should only call plugin once and resolve correctly", async () => {
+		jest.setTimeout(30000);
+
 		let finalize;
 		const func = () => {
 			return new Promise((resolve) => {
