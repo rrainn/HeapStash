@@ -65,21 +65,17 @@ class HeapStash {
 		}
 
 		function checkItem (item) {
-			if (item) {
-				primaryDebugGet(`Got item: ${JSON.stringify(item)}`);
-				if (typeof item.ttl === "number") {
-					if (item.ttl > Date.now()) {
-						primaryDebugGet(`Returning item: ${item.data}`);
-						return item.data;
-					} else {
-						primaryDebugGet("TTL in past, item expired. Not returning anything.");
-					}
-				} else {
+			primaryDebugGet(`Got item: ${JSON.stringify(item)}`);
+			if (typeof item.ttl === "number") {
+				if (item.ttl > Date.now()) {
 					primaryDebugGet(`Returning item: ${item.data}`);
 					return item.data;
+				} else {
+					primaryDebugGet("TTL in past, item expired. Not returning anything.");
 				}
 			} else {
-				primaryDebugGet("No item passed into checkItem. Not returning anything.");
+				primaryDebugGet(`Returning item: ${item.data}`);
+				return item.data;
 			}
 		}
 
