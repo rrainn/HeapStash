@@ -72,6 +72,8 @@ describe("FileSystem", () => {
 		});
 
 		it("Should put item in file system cache with different ttl", async () => {
+			const DIFFERENCE_ALLOWED = 10;
+
 			await cache.put("id", {"myitem": "Hello World"}, {"pluginTTL": 500});
 
 			return new Promise((resolve, reject) => fs.readFile(path.join(__dirname, "tmp", "id"), "utf8", (err, data) => {
@@ -80,7 +82,8 @@ describe("FileSystem", () => {
 				} else {
 					try {
 						data = JSON.parse(data);
-						expect(data).toEqual({"data": {"myitem": "Hello World"}, "ttl": 500});
+						expect(data.data).toEqual({"myitem": "Hello World"});
+						expect(data.ttl - 500).toBeWithinRange(Date.now() - DIFFERENCE_ALLOWED, Date.now() + DIFFERENCE_ALLOWED);
 						resolve();
 					} catch (e) {
 						reject(e);
