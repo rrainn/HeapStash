@@ -154,9 +154,9 @@ class HeapStash {
 						primaryDebugFetch("Running retrieve function");
 						result = await retrieveFunction(id);
 						primaryDebugFetch("Done running retrieve function");
+						primaryDebugFetch(`Got result from retrieveFunction, putting item: ${result}`);
+						await this.put(id, result, settings as any);
 					}
-					primaryDebugFetch(`Got result from retrieveFunction: ${result}`);
-					await this.put(id, result, settings as any);
 					inprogressfetchpromises = this._.inprogressfetchpromises[internalID].map((item) => item.resolve);
 				} catch (e) {
 					primaryDebugFetch(`Got error from retrieveFunction: ${e}`);
