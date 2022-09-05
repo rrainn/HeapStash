@@ -182,9 +182,9 @@ class HeapStash {
 			}
 		});
 	}
-	async put (id: string, item: any, settings: PutSettings = {}) {
+	async put (id: string | string[], item: any, settings: PutSettings = {}) {
 		primaryDebugPut(`Putting item: ${item} with ID: ${id}`);
-		if (!id) {
+		if (!id || Array.isArray(id) && id.length <= 0) {
 			throw new Error("ID required to put item in cache.");
 		}
 		if (item === undefined || item === null) {
@@ -211,8 +211,11 @@ class HeapStash {
 			primaryDebugPut(`Adding TTL: ${storedObject.ttl}`);
 		}
 		primaryDebugPut(`Storing item in cache: ${JSON.stringify(storedObject)}`);
-		this._.internalcache[id] = storedObject;
-		this._.internalcachearray.push(id);
+		const ids = Array.isArray(id) ? id : [id];
+		for (const id of ids) {
+			this._.internalcache[id] = storedObject;
+			this._.internalcachearray.push(id);
+		}
 
 		if (!settings.internalCacheOnly) {
 			const pluginStoredObject = {...storedObject};

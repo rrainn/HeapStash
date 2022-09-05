@@ -19,6 +19,16 @@ describe("put()", () => {
 		expect(error.message).toEqual("ID required to put item in cache.");
 	});
 
+	it("Should throw if empty array passed in for ID", async () => {
+		let error;
+		try {
+			await cache.put([]);
+		} catch (e) {
+			error = e;
+		}
+		expect(error.message).toEqual("ID required to put item in cache.");
+	});
+
 	it("Should throw if nothing passed in for item", async () => {
 		let error;
 		try {

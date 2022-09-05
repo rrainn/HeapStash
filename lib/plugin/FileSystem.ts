@@ -21,17 +21,11 @@ export = (settings) => {
 			});
 		});
 	};
-	filesystem.tasks.put = (id: string, data: any): Promise<void> => {
-		return new Promise<void>((resolve, reject) => {
-			fs.writeFile(path.join(settings.path, id), JSON.stringify(data), (err) => {
-				/* istanbul ignore next */
-				if (err) {
-					reject();
-				} else {
-					resolve();
-				}
-			});
-		});
+	filesystem.tasks.put = async (id: string | string[], data: any): Promise<void> => {
+		function set (id: string) {
+			return fs.promises.writeFile(path.join(settings.path, id), JSON.stringify(data));
+		}
+		await Promise.all((Array.isArray(id) ? id : [id]).map(set));
 	};
 	filesystem.tasks.remove = (id: string): Promise<void> => {
 		return new Promise<void>((resolve, reject) => {

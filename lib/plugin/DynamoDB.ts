@@ -51,7 +51,7 @@ export = (settings) => {
 
 		return item;
 	};
-	plugin.tasks.put = async (id: string, data: any) => {
+	plugin.tasks.put = async (id: string | string[], data: any) => {
 		data = {...data};
 		if (data.ttl) {
 			data.ttl = Math.round(data.ttl / 1000);
@@ -62,34 +62,76 @@ export = (settings) => {
 		}
 
 		try {
-			const dynamoObject = AWS.DynamoDB.Converter.marshall({
-				...data,
-				[plugin._.primaryKey]: id
-			});
-			primaryDebugPut("marshalled object: %o", dynamoObject);
-			const putItemRequest = {
-				"Item": dynamoObject,
-				"TableName": plugin._.tableName
-			};
-			primaryDebugPut("putItem request: %o", putItemRequest);
-			await awsWrapper(plugin._.dynamodb.putItem(putItemRequest));
-		} catch (e) {
-			if (e.code === "ValidationException") {
-				const dynamoPreObject = {
-					"data": JSON.stringify(data.data),
-					"_": {
-						"stringified": true
-					},
+			if (Array.isArray(id)) {
+				await awsWrapper(plugin._.dynamodb.batchWriteItem({
+					"RequestItems": {
+						[plugin._.tableName]: id.map((id) => {
+							return {
+								"PutRequest": {
+									"Item": AWS.DynamoDB.Converter.marshall({
+										...data,
+										[plugin._.primaryKey]: id
+									})
+								}
+							};
+						})
+					}
+				}));
+			} else {
+				const dynamoObject = AWS.DynamoDB.Converter.marshall({
+					...data,
 					[plugin._.primaryKey]: id
-				};
-				if (data[plugin._.ttlAttribute]) {
-					dynamoPreObject[plugin._.ttlAttribute] = data[plugin._.ttlAttribute];
-				}
-				const dynamoObject = AWS.DynamoDB.Converter.marshall(dynamoPreObject);
-				await awsWrapper(plugin._.dynamodb.putItem({
+				});
+				primaryDebugPut("marshalled object: %o", dynamoObject);
+				const putItemRequest = {
 					"Item": dynamoObject,
 					"TableName": plugin._.tableName
-				}));
+				};
+				primaryDebugPut("putItem request: %o", putItemRequest);
+				await awsWrapper(plugin._.dynamodb.putItem(putItemRequest));
+			}
+		} catch (e) {
+			if (e.code === "ValidationException") {
+				if (Array.isArray(id)) {
+					await awsWrapper(plugin._.dynamodb.batchWriteItem({
+						"RequestItems": {
+							[plugin._.tableName]: id.map((id) => {
+								const dynamoPreObject = {
+									"data": JSON.stringify(data.data),
+									"_": {
+										"stringified": true
+									},
+									[plugin._.primaryKey]: id
+								};
+								if (data[plugin._.ttlAttribute]) {
+									dynamoPreObject[plugin._.ttlAttribute] = data[plugin._.ttlAttribute];
+								}
+
+								return {
+									"PutRequest": {
+										"Item": AWS.DynamoDB.Converter.marshall(dynamoPreObject)
+									}
+								};
+							})
+						}
+					}));
+				} else {
+					const dynamoPreObject = {
+						"data": JSON.stringify(data.data),
+						"_": {
+							"stringified": true
+						},
+						[plugin._.primaryKey]: id
+					};
+					if (data[plugin._.ttlAttribute]) {
+						dynamoPreObject[plugin._.ttlAttribute] = data[plugin._.ttlAttribute];
+					}
+					const dynamoObject = AWS.DynamoDB.Converter.marshall(dynamoPreObject);
+					await awsWrapper(plugin._.dynamodb.putItem({
+						"Item": dynamoObject,
+						"TableName": plugin._.tableName
+					}));
+				}
 			} else {
 				throw e;
 			}

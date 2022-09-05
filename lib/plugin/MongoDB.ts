@@ -21,7 +21,7 @@ export = async (settings: MongoDBPluginSettings): Promise<Plugin> => {
 			return result;
 		}
 	};
-	mongo.tasks.put = async (id: string, data: any): Promise<void> => {
+	mongo.tasks.put = async (id: string | string[], data: any): Promise<void> => {
 		const updateObject: any = { "$set": data };
 
 		if (data.ttl) {
@@ -29,7 +29,10 @@ export = async (settings: MongoDBPluginSettings): Promise<Plugin> => {
 			delete data.ttl;
 		}
 
-		await collection.updateOne({ id }, updateObject, {"upsert": true});
+		function set (id: string) {
+			return collection.updateOne({ id }, updateObject, {"upsert": true});
+		}
+		await Promise.all((Array.isArray(id) ? id : [id]).map(set));
 	};
 	mongo.tasks.remove = async (id: string): Promise<void> => {
 		await collection.deleteOne({ id });

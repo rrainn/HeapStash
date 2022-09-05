@@ -16,14 +16,17 @@ export = (settings: RedisPluginSettings): Plugin => {
 			throw new Error();
 		}
 	};
-	redis.tasks.put = async (id: string, data: any): Promise<void> => {
+	redis.tasks.put = async (id: string | string[], data: any): Promise<void> => {
 		const dataStr: string = JSON.stringify(data);
 
-		if (data.ttl) {
-			await settings.client.set(id, dataStr, "EX", Math.round((Date.now() - data.ttl) / 1000));
-		} else {
-			await settings.client.set(id, dataStr);
+		function set (id: string) {
+			if (data.ttl) {
+				return settings.client.set(id, dataStr, "EX", Math.round((Date.now() - data.ttl) / 1000));
+			} else {
+				return settings.client.set(id, dataStr);
+			}
 		}
+		await Promise.all((Array.isArray(id) ? id : [id]).map(set));
 	};
 	redis.tasks.remove = async (id: string): Promise<void> => {
 		await settings.client.del(id);
